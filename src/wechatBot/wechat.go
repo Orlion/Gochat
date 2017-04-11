@@ -9,7 +9,6 @@ import (
 	"encoding/xml"
 	"strconv"
 	"math/rand"
-	"net/url"
 )
 
 type  Wechat struct {
@@ -43,6 +42,7 @@ func (this *Wechat) Init() {
 		"gzip, deflate, sdch, br",
 		"zh-CN,zh;q=0.8",
 		"keep-alive",
+		"",
 		"",
 		"",
 		"login.wx2.qq.com",
@@ -172,13 +172,40 @@ func (this *Wechat) AnalysisLoginXml(xmlStr string) (Error, error) {
 
 func (this *Wechat) WxInit() {
 	this.HttpClient.HttpHeader.ContentType = "application/json;charset=UTF-8"
+	this.HttpClient.HttpHeader.ContentLength = "101"
 	this.HttpClient.HttpHeader.Cookie = Cookies2String(this.Cookies)
-	wxInitApi := strings.Replace(Config["wx_init_api"], "{pass_ticker}", this.PassTicket, 1)
-	postData := url.Values{}
-	var baseReq = []string{`{Uin: "`+ this.Uin + `", Sid: "`+ this.Sid +`", Skey: "`+ this.Skey +`", DeviceID: "`+ this.DeviceID +`"}`}
-	postData["BaseRequest"] = baseReq
-	fmt.Println("开始post" + baseReq[0])
-	content, _, err := this.HttpClient.Post(wxInitApi, postData)
-	fmt.Println(err)
-	fmt.Println(content)
+	wxInitApi := strings.Replace(Config["wx_init_api"], "{r}", strconv.Itoa(int(time.Now().Unix())), 1)
+	var postData string = `{BaseRequest: {Uin: "`+ this.Uin + `", Sid: "`+ this.Sid +`", Skey: "`+ this.Skey +`", DeviceID: "`+ this.DeviceID +`"}}`
+	content, _, _ := this.HttpClient.PostStr(wxInitApi, postData)
+	fmt.Println("content:" + content)
+}
+
+func (this *Wechat) StatusNotify() {
+	this.HttpClient.HttpHeader.ContentType = "application/json;charset=UTF-8"
+	this.HttpClient.HttpHeader.ContentLength = "348"
+	this.HttpClient.HttpHeader.Cookie = Cookies2String(this.Cookies)
+	wxInitApi := strings.Replace(Config["wx_statusnotify_api"], "{pass_ticket}", this.PassTicket, 1)
+	var postData string = `{BaseRequest: {Uin: "`+ this.Uin + `", Sid: "`+ this.Sid +`", Skey: "`+ this.Skey +`", DeviceID: "`+ this.DeviceID +`"}}`
+	content, _, _ := this.HttpClient.PostStr(wxInitApi, postData)
+	fmt.Println("content:" + content)
+}
+
+func (this *Wechat) MakeContactList() {
+
+}
+
+func (this *Wechat) GetBatchGroupMembers() {
+
+}
+
+func (this *Wechat) Sync() {
+
+}
+
+func (this *Wechat) SyncCheck() {
+
+}
+
+func (this *Wechat) SendMsg() {
+
 }
