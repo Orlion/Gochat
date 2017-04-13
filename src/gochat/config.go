@@ -12,6 +12,6 @@ var Config = map[string]string {
 	"sync_api": 			"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid={sid}&skey={skey}&lang=zh_CN&pass_ticket={pass_ticket}",
 	// 暂时没用到
 	"statreport_api": 		"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatreport?fun=new&lang=zh_CN&pass_ticket={pass_ticket}",
-	"synccheck_api": 		"https://webpush.wx2.qq.com/cgi-bin/mmwebwx-bin/synccheck?r={r}&skey={skey}&sid={sid}&uin={uid}&deviceid={deviceid}&synckey=1_660902725%7C2_660902839%7C3_660902841%7C1000_1491905341&_=1491916243535",
+	"synccheck_api": 		"https://webpush.wx2.qq.com/cgi-bin/mmwebwx-bin/synccheck?r={r}&skey={skey}&sid={sid}&uin={uin}&deviceid={deviceid}&synckey={synckey}",
 	"sendmsg_api": 			"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket={pass_ticket}",
 }

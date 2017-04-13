@@ -14,6 +14,7 @@ import (
 type  Wechat struct {
 	BaseRequest BaseRequest
 	PassTicket 	string
+	syncKey   	map[string]interface{}
 	Uuid 		string
 	Utils		Utils
 	HttpClient	*HttpClient
@@ -24,6 +25,38 @@ type BaseRequest struct {
 	Skey       	string
 	Uin      	string
 	DeviceID	string
+}
+
+type Response struct {
+	BaseResponse *BaseResponse
+}
+
+type BaseResponse struct {
+	Ret    int
+	ErrMsg string
+}
+
+// Contact is wx Account struct
+type Contact struct {
+	GGID            string
+	UserName        string
+	NickName        string
+	HeadImgURL      string `json:"HeadImgUrl"`
+	HeadHash        string
+	RemarkName      string
+	DisplayName     string
+	StarFriend      float64
+	Sex             float64
+	Signature       string
+	VerifyFlag      float64
+	ContactFlag     float64
+	HeadImgFlag     float64
+	Province        string
+	City            string
+	Alias           string
+	EncryChatRoomID string `json:"EncryChatRoomId"`
+	Type            int
+	MemberList      []*Contact
 }
 
 /**
@@ -208,8 +241,20 @@ func (this *Wechat) init() error {
 		"",
 	}
 	this.HttpClient.HttpHeader.Cookies = cookies
-	// WTF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	content, _, _ := this.HttpClient.Post(wxInitApi, postData, time.Second * 5)
-	fmt.Println("content:" + content)
+	// WTF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	content, _, err := this.HttpClient.Post(wxInitApi, postData, time.Second * 5)
+	if err != nil {
+		return err
+	}
+	type initResp struct {
+		Response
+		User    Contact
+		Skey    string
+		SyncKey map[string]interface{}
+	}
+	var initres initResp
+	err = json.Unmarshal([]byte(content), &initres)
+	this.BaseRequest.Skey = initres.Skey
+	this.syncKey = initres.SyncKey
 	return nil
 }

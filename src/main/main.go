@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gochat"
 	"fmt"
+	"gochat"
 )
 
 func main() {
@@ -11,4 +11,5 @@ func main() {
 	uuid, _ := wechat.Begin()
 	fmt.Println("https://login.weixin.qq.com/qrcode/" + uuid)
 	wechat.Login()
+	wechat.Getcontacts()
 }
