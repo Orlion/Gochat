@@ -6,7 +6,9 @@ import (
 	"time"
 	"errors"
 	"io/ioutil"
-	"strings"
+	"bytes"
+	"net/http/cookiejar"
+	"net/url"
 )
 
 type HttpClient struct {
@@ -20,13 +22,22 @@ type HttpHeader struct {
 	Connection string
 	ContentType string
 	ContentLength string
-	Cookie string
+	Cookies []*http.Cookie
 	Host string
 	Referer string
 	UpgradeInsecureRequests string
 }
 
-func (this *HttpClient) Get(url string, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient) Get(urlStr string, timeout time.Duration) (string, []*http.Cookie, error) {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return "", nil, err
+	}
+	urlObj, err := url.Parse(urlStr)
+	if err != nil {
+		return "", nil, err
+	}
+	jar.SetCookies(urlObj, this.HttpHeader.Cookies)
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: func(netw, addr string) (net.Conn, error) {
@@ -43,8 +54,9 @@ func (this *HttpClient) Get(url string, timeout time.Duration) (string, []*http.
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return errors.New("Cannot Redirect")
 		},
+		Jar: jar,
 	}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		return ``, nil, err
 	}
@@ -76,10 +88,6 @@ func (this *HttpClient) Get(url string, timeout time.Duration) (string, []*http.
 		req.Header.Add("Content-Length", this.HttpHeader.ContentLength)
 	}
 
-	if this.HttpHeader.Cookie != "" {
-		req.Header.Add("Cookie", this.HttpHeader.Cookie)
-	}
-
 	if this.HttpHeader.Referer != "" {
 		req.Header.Add("Referer", this.HttpHeader.Referer)
 	}
@@ -100,7 +108,16 @@ func (this *HttpClient) Get(url string, timeout time.Duration) (string, []*http.
 	return string(body), resp.Cookies(), nil
 }
 
-func (this *HttpClient)Post(url string, data string, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient)Post(urlStr string, data []byte, timeout time.Duration) (string, []*http.Cookie, error) {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return "", nil, err
+	}
+	urlObj, err := url.Parse(urlStr)
+	if err != nil {
+		return "", nil, err
+	}
+	jar.SetCookies(urlObj, this.HttpHeader.Cookies)
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: func(netw, addr string) (net.Conn, error) {
@@ -117,9 +134,9 @@ func (this *HttpClient)Post(url string, data string, timeout time.Duration) (str
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return errors.New("Cannot Redirect")
 		},
+		Jar: jar,
 	}
-	postData := ioutil.NopCloser(strings.NewReader(data))
-	req, err := http.NewRequest("POST", url, postData)
+	req, err := http.NewRequest("POST", urlStr, bytes.NewReader(data))
 	if err != nil {
 		return ``, nil, err
 	}
@@ -144,10 +161,6 @@ func (this *HttpClient)Post(url string, data string, timeout time.Duration) (str
 
 	if this.HttpHeader.ContentType != "" {
 		req.Header.Add("Content-Type", this.HttpHeader.ContentType)
-	}
-
-	if this.HttpHeader.Cookie != "" {
-		req.Header.Add("Cookie", this.HttpHeader.Cookie)
 	}
 
 	if this.HttpHeader.Host != "" {

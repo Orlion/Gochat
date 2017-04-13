@@ -5,7 +5,6 @@ import (
 	"time"
 	"fmt"
 	"strings"
-	"net/http"
 	"encoding/xml"
 	"strconv"
 	"math/rand"
@@ -16,7 +15,6 @@ type  Wechat struct {
 	BaseRequest BaseRequest
 	PassTicket 	string
 	Uuid 		string
-	Cookies		[]*http.Cookie
 	Utils		Utils
 	HttpClient	*HttpClient
 }
@@ -42,7 +40,7 @@ func New() *Wechat{
 				"keep-alive",
 				"",
 				"",
-				"",
+				nil,
 				"login.wx2.qq.com",
 				"https://wx.qq.com/",
 				"1",
@@ -144,11 +142,11 @@ func (this *Wechat) polling(tip int) (string, error){
 func (this *Wechat) doLogin(redirectUrl string) error {
 	this.HttpClient.HttpHeader.Accept = "application/json, text/plain, */*"
 	this.HttpClient.HttpHeader.Host = "wx2.qq.com"
-	content, cookies, err := this.HttpClient.Get(redirectUrl + "&fun=new&version=v2&lang=zh_CN", time.Second * 5)
+	content, cookie, err := this.HttpClient.Get(redirectUrl + "&fun=new&version=v2&lang=zh_CN", time.Second * 5)
 	if err != nil {
 		return err
 	}
-	this.Cookies = cookies
+	this.HttpClient.HttpHeader.Cookies = cookie
 	this.BaseRequest, this.PassTicket, err = this.analysisLoginXml(content)
 
 	return err
@@ -185,18 +183,33 @@ func (this *Wechat) analysisLoginXml(xmlStr string) (BaseRequest, string, error)
 	return baseRequest, v.PassTicket, nil
 }
 
-
-func (this *Wechat) init() {
+func (this *Wechat) init() error {
 	wxInitApi := strings.Replace(Config["wx_init_api"], "{r}", strconv.Itoa(int(time.Now().Unix())), 1)
 	type initRequest struct {
 		BaseRequest BaseRequest
 	}
-	postData, _ := json.Marshal(initRequest{
+	postData, err := json.Marshal(initRequest{
 		BaseRequest: this.BaseRequest,
 	})
-	this.HttpClient.HttpHeader.Accept = "application/json, text/plain, */*"
-	this.HttpClient.HttpHeader.ContentType = "application/json;charset=UTF-8"
-	this.HttpClient.HttpHeader.Cookie = this.Utils.Cookies2String(this.Cookies)
-	content, _, _ := this.HttpClient.Post(wxInitApi, string(postData), time.Second * 5)
+	if err != nil {
+		return err
+	}
+	cookies := this.HttpClient.HttpHeader.Cookies
+	this.HttpClient.HttpHeader = HttpHeader{
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		nil,
+		"",
+		"",
+		"",
+	}
+	this.HttpClient.HttpHeader.Cookies = cookies
+	// WTF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	content, _, _ := this.HttpClient.Post(wxInitApi, postData, time.Second * 5)
 	fmt.Println("content:" + content)
+	return nil
 }
