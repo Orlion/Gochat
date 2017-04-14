@@ -28,7 +28,7 @@ type HttpHeader struct {
 	UpgradeInsecureRequests string
 }
 
-func (this *HttpClient) Get(urlStr string, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient) get(urlStr string, timeout time.Duration) (string, []*http.Cookie, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return "", nil, err
@@ -108,7 +108,7 @@ func (this *HttpClient) Get(urlStr string, timeout time.Duration) (string, []*ht
 	return string(body), resp.Cookies(), nil
 }
 
-func (this *HttpClient)Post(urlStr string, data []byte, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration) (string, []*http.Cookie, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return "", nil, err

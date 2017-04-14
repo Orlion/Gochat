@@ -15,7 +15,9 @@ type  Wechat struct {
 	BaseRequest BaseRequest
 	PassTicket 	string
 	syncKey   	map[string]interface{}
+	syncHost	string
 	Uuid 		string
+	Me			Contact
 	Utils		Utils
 	HttpClient	*HttpClient
 }
@@ -34,29 +36,6 @@ type Response struct {
 type BaseResponse struct {
 	Ret    int
 	ErrMsg string
-}
-
-// Contact is wx Account struct
-type Contact struct {
-	GGID            string
-	UserName        string
-	NickName        string
-	HeadImgURL      string `json:"HeadImgUrl"`
-	HeadHash        string
-	RemarkName      string
-	DisplayName     string
-	StarFriend      float64
-	Sex             float64
-	Signature       string
-	VerifyFlag      float64
-	ContactFlag     float64
-	HeadImgFlag     float64
-	Province        string
-	City            string
-	Alias           string
-	EncryChatRoomID string `json:"EncryChatRoomId"`
-	Type            int
-	MemberList      []*Contact
 }
 
 /**
@@ -86,8 +65,8 @@ func New() *Wechat{
  * 获取uuid
  */
 func (this *Wechat) Begin() (string, error) {
-	getUuidApiUrl := Config["getUuidApi"] + this.Utils.GetUnixMsTime()
-	content, _, err := this.HttpClient.Get(getUuidApiUrl, time.Second * 5)
+	getUuidApiUrl := Config["getUuidApi"] + this.Utils.getUnixMsTime()
+	content, _, err := this.HttpClient.get(getUuidApiUrl, time.Second * 5)
 	if err != nil {
 		return ``, err
 	}
@@ -142,12 +121,12 @@ func (this *Wechat) Login() error {
 func (this *Wechat) polling(tip int) (string, error){
 	loginPollApi := strings.Replace(Config["login_poll_api"], "{uuid}", this.Uuid, 1)
 	loginPollApi = strings.Replace(loginPollApi, "{tip}", strconv.Itoa(tip), 1)
-	loginPollApi = strings.Replace(loginPollApi, "{time}", this.Utils.GetUnixMsTime(), 1)
+	loginPollApi = strings.Replace(loginPollApi, "{time}", this.Utils.getUnixMsTime(), 1)
 
 	this.HttpClient.HttpHeader.Accept = "*/*"
 	this.HttpClient.HttpHeader.Host = "login.wx2.qq.com"
 	this.HttpClient.HttpHeader.Referer = "https://wx2.qq.com/?&lang=zh_CN"
-	content, _, err := this.HttpClient.Get(loginPollApi, time.Second * 30)
+	content, _, err := this.HttpClient.get(loginPollApi, time.Second * 30)
 	if err != nil {
 		return ``, err
 	}
@@ -175,7 +154,7 @@ func (this *Wechat) polling(tip int) (string, error){
 func (this *Wechat) doLogin(redirectUrl string) error {
 	this.HttpClient.HttpHeader.Accept = "application/json, text/plain, */*"
 	this.HttpClient.HttpHeader.Host = "wx2.qq.com"
-	content, cookie, err := this.HttpClient.Get(redirectUrl + "&fun=new&version=v2&lang=zh_CN", time.Second * 5)
+	content, cookie, err := this.HttpClient.get(redirectUrl + "&fun=new&version=v2&lang=zh_CN", time.Second * 5)
 	if err != nil {
 		return err
 	}
@@ -254,6 +233,7 @@ func (this *Wechat) init() error {
 	}
 	var initres initResp
 	err = json.Unmarshal([]byte(content), &initres)
+	this.Me = initres.User
 	this.BaseRequest.Skey = initres.Skey
 	this.syncKey = initres.SyncKey
 	return nil
