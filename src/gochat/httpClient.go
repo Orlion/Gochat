@@ -12,7 +12,6 @@ import (
 )
 
 type HttpClient struct {
-	HttpHeader HttpHeader
 	Cookies []*http.Cookie
 }
 
