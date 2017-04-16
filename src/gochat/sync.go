@@ -54,8 +54,19 @@ func (this *Wechat) beginSync() error {
 				if err != nil {
 					return err
 				}
-
 				continueFlag = resp.ContinueFlag
+
+				if resp.ModContactCount > 0 {
+					_, err := this.contactsModify(resp.ModContactList)
+					if err != nil {
+
+					}
+				}
+
+				if resp.DelContactCount > 0 {
+					this.contactsDelete(resp.DelContactList)
+				}
+
 				go this.handleSyncResponse(resp)
 			}
 		}
@@ -95,7 +106,6 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 		Host: 				"wx2.qq.com",
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
-	fmt.Println(content)
 	if err != nil {
 		return nil, err
 	}
@@ -155,10 +165,8 @@ func (this *Wechat) syncCheck() (string, string, error) {
 		if err != err {
 			return "", "", err
 		}
-		fmt.Println(syncCheckResContent)
 
 		code, selector, err := this.analysisSelector(syncCheckResContent)
-		fmt.Println("code=" + code + ",selector=" + selector)
 		if err != nil {
 			return "", "", err
 		}

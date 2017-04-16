@@ -13,16 +13,17 @@ import (
 )
 
 type  Wechat struct {
-	Uuid 		string
-	baseRequest BaseRequest
-	passTicket 	string
-	me 			Contact
-	syncKey   	map[string]interface{}
-	syncHost	string
-	utils		Utils
-	httpClient	HttpClient
-	storage		Storage
-	listener	Listener
+	Uuid 				string
+	baseRequest 		BaseRequest
+	passTicket 			string
+	me 					Contact
+	contacts			map[string]*Contact		// 处理后的联系人列表: UserName => Contact
+	syncKey   			map[string]interface{}
+	syncHost			string
+	utils				Utils
+	httpClient			HttpClient
+	storage				Storage
+	listener			Listener
 }
 
 type BaseRequest struct {
@@ -41,6 +42,13 @@ type BaseResponse struct {
 	ErrMsg string
 }
 
+type initResp struct {
+	Response
+	User    Contact
+	Skey    string
+	SyncKey map[string]interface{}
+}
+
 /**
  * 初始化
  */
@@ -55,7 +63,7 @@ func NewWechat() *Wechat{
  * 获取uuid
  */
 func (this *Wechat) Run() error {
-	getUuidApiUrl := Config["getUuidApi"] + this.utils.getUnixMsTime()
+	getUuidApiUrl := Config["get_uuid_api"] + this.utils.getUnixMsTime()
 	content, err := this.httpClient.get(getUuidApiUrl, time.Second * 5, &HttpHeader{
 		Accept: 			"*/*",
 		AcceptEncoding: 	"gzip, deflate, br",
@@ -104,7 +112,7 @@ func (this *Wechat) login() error {
 		}
 
 		if "201" == redirectUrl {
-			fmt.Println("用户已扫码,等待确认中...")
+			fmt.Println("已扫码,请确认.")
 			tip = 0
 			continue
 		}
@@ -114,7 +122,12 @@ func (this *Wechat) login() error {
 			return err
 		}
 
-		return this.init()
+		err = this.init()
+		if err != nil {
+			return err
+		}
+
+		return this.initContact()
 	}
 }
 
@@ -218,18 +231,19 @@ func (this *Wechat) init() error {
 		return err
 	}
 
-	content, err := this.httpClient.post(wxInitApi, postData, time.Second * 5, &HttpHeader{})
+	content, err := this.httpClient.post(wxInitApi, postData, time.Second * 5, &HttpHeader{
+		Host: 				"login.wx2.qq.com",
+		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+	})
 	if err != nil {
 		return err
 	}
-	type initResp struct {
-		Response
-		User    Contact
-		Skey    string
-		SyncKey map[string]interface{}
-	}
+
 	var initres initResp
 	err = json.Unmarshal([]byte(content), &initres)
+	if err != nil {
+		return nil
+	}
 	this.me = initres.User
 	this.baseRequest.Skey = initres.Skey
 	this.syncKey = initres.SyncKey
