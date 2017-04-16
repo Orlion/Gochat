@@ -8,10 +8,10 @@ var Config = map[string]string {
 	"wx_init_api": 			"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=-{r}",
 	"wx_statusnotify_api": 	"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatusnotify?lang=zh_CN&pass_ticket={pass_ticker}",
 	"getcontact_api": 		"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket={pass_ticket}&r={r}&seq={seq}&skey={skey}",
-	"batchgetcontact_api": 	"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?type=ex&r={r}&lang=zh_CN&pass_ticket={pass_ticket}",
+	"batchgetcontact_api": 	"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?type=ex&r={r}",
 	"sync_api": 			"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid={sid}&skey={skey}",
-	// 暂时没用到
-	"statreport_api": 		"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatreport?fun=new&lang=zh_CN&pass_ticket={pass_ticket}",
 	"synccheck_api": 		"https://{host}/cgi-bin/mmwebwx-bin/synccheck?r={r}&skey={skey}&sid={sid}&uin={uin}&deviceid={deviceid}&synckey={synckey}",
 	"sendmsg_api": 			"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket={pass_ticket}",
+	// 暂时没用到
+	"statreport_api": 		"https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatreport?fun=new&lang=zh_CN&pass_ticket={pass_ticket}",
 }

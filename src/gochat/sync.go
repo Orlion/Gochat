@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"encoding/json"
 	"strconv"
+	"errors"
 )
 
 type syncMessageRequest struct {
@@ -41,39 +42,29 @@ func (this *Wechat) beginSync() error {
 		}
 
 		if code != "0" {
-			return error("Syncing failed, please relogin. [code]:" + code)
+			return errors.New("Syncing failed, please relogin. [code]:" + code)
 		}
 
 		// 接收到了消息
 		if selector != "0" {
 			continueFlag := -1
 			// 持续接收消息直到continueFlag为0
-			for continueFlag != "0" {
+			for continueFlag != 0 {
 				resp, err := this.sync()
 				if err != nil {
 					return err
 				}
 
 				continueFlag = resp.ContinueFlag
-				if resp.ModContactCount > 0 {
-
-				}
-				if resp.DelContactCount >0 {
-
-				}
-				if resp.ModChatRoomMemberCount >0 {
-
-				}
-
-				go this.handleServerEvent(resp)
+				go this.handleSyncResponse(resp)
 			}
 		}
 	}
 }
 
 func (this *Wechat) sync() (*syncMessageResponse, error) {
-	syncApi := strings.Replace(Config["sync_api"], "{sid}", this.BaseRequest.Sid, 1)
-	syncApi = strings.Replace(syncApi, "{skey}", this.BaseRequest.Skey, 1)
+	syncApi := strings.Replace(Config["sync_api"], "{sid}", this.baseRequest.Sid, 1)
+	syncApi = strings.Replace(syncApi, "{skey}", this.baseRequest.Skey, 1)
 
 	syncKeyf := make(map[string]interface{}, 0)
 	keys := strings.Split(this.formattedSyncCheckKey(), "|")
@@ -87,9 +78,10 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 		kvmap := map[string]int64{"Key": k, "Val": v}
 		list = append(list, kvmap)
 	}
+
 	syncKeyf["List"] = list
 	data, err := json.Marshal(syncMessageRequest{
-		BaseRequest: this.BaseRequest,
+		BaseRequest: this.baseRequest,
 		SyncKey:     syncKeyf,
 		RR:          ^time.Now().Unix(),
 	})
@@ -98,15 +90,20 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 		return nil, err
 	}
 
-	content, _, err := this.HttpClient.Post(syncApi, data, time.Second * 5)
+	content, err := this.httpClient.post(syncApi, data, time.Second * 5, &HttpHeader{
+		ContentType:		"application/json;charset=utf-8",
+		Host: 				"wx2.qq.com",
+		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+	})
+	fmt.Println(content)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var smr syncMessageResponse
 	err = json.Unmarshal([]byte(content), &smr)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if smr.SyncCheckKey != nil {
@@ -115,11 +112,10 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 		this.syncKey = smr.SyncKey
 	}
 
-	return smr, err
+	return &smr, err
 }
 
 func (this *Wechat) syncCheck() (string, string, error) {
-
 	hosts := [...]string{
 		`webpush.wx2.qq.com`,
 		`webpush.wx.qq.com`,
@@ -141,21 +137,30 @@ func (this *Wechat) syncCheck() (string, string, error) {
 
 	for _, host := range hosts {
 		syncCheckApi := strings.Replace(Config["synccheck_api"], "{host}", host, 1)
-		syncCheckApi = strings.Replace(syncCheckApi, "{r}", this.Utils.GetUnixMsTime(), 1)
-		syncCheckApi = strings.Replace(syncCheckApi, "{skey}", this.BaseRequest.Skey, 1)
-		syncCheckApi = strings.Replace(syncCheckApi, "{sid}", this.BaseRequest.Sid, 1)
-		syncCheckApi = strings.Replace(syncCheckApi, "{uid}", this.BaseRequest.Uin, 1)
-		syncCheckApi = strings.Replace(syncCheckApi, "{deviceid}", this.BaseRequest.DeviceID, 1)
+		syncCheckApi = strings.Replace(syncCheckApi, "{r}", this.utils.getUnixMsTime(), 1)
+		syncCheckApi = strings.Replace(syncCheckApi, "{skey}", this.baseRequest.Skey, 1)
+		syncCheckApi = strings.Replace(syncCheckApi, "{sid}", this.baseRequest.Sid, 1)
+		syncCheckApi = strings.Replace(syncCheckApi, "{uin}", this.baseRequest.Uin, 1)
+		syncCheckApi = strings.Replace(syncCheckApi, "{deviceid}", this.baseRequest.DeviceID, 1)
 		syncCheckApi = strings.Replace(syncCheckApi, "{synckey}", this.formattedSyncCheckKey(), 1)
 
-		syncCheckRes, _, err := this.HttpClient.Get(syncCheckApi, time.Second * 26)
+		syncCheckResContent, err := this.httpClient.get(syncCheckApi, time.Second * 26, &HttpHeader{
+			Accept: 			"*/*",
+			AcceptEncoding: 	"gzip, deflate, br",
+			AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+			Connection: 		"keep-alive",
+			Host: 				host,
+			Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+		})
 		if err != err {
-			return err
+			return "", "", err
 		}
+		fmt.Println(syncCheckResContent)
 
-		code, selector, err := this.analysisSelector(syncCheckRes)
+		code, selector, err := this.analysisSelector(syncCheckResContent)
+		fmt.Println("code=" + code + ",selector=" + selector)
 		if err != nil {
-			return err
+			return "", "", err
 		}
 
 		if code == `0` {
@@ -163,12 +168,12 @@ func (this *Wechat) syncCheck() (string, string, error) {
 		}
 	}
 
-	return ``, ``, nil
+	return "", "", nil
 }
 
 func (this *Wechat) analysisSelector(syncCheckRes string) (string, string, error) {
 
-	reg, err := regexp.Compile(`window.synccheck=\{retcode:"(\.+)",selector:"(\.+)"}`)
+	reg, err := regexp.Compile(`window.synccheck=\{retcode:"(.+)",selector:"(.+)"\}`)
 	if err != nil {
 		return ``, ``, err
 	}
@@ -177,7 +182,7 @@ func (this *Wechat) analysisSelector(syncCheckRes string) (string, string, error
 		return ``, ``, nil
 	}
 
-	return selectorArr[1], selectorArr[2], nil
+	return string(selectorArr[1]), string(selectorArr[2]), nil
 }
 
 func (this *Wechat) formattedSyncCheckKey() string {

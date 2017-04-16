@@ -13,6 +13,7 @@ import (
 
 type HttpClient struct {
 	HttpHeader HttpHeader
+	Cookies []*http.Cookie
 }
 
 type HttpHeader struct {
@@ -22,22 +23,21 @@ type HttpHeader struct {
 	Connection string
 	ContentType string
 	ContentLength string
-	Cookies []*http.Cookie
 	Host string
 	Referer string
 	UpgradeInsecureRequests string
 }
 
-func (this *HttpClient) get(urlStr string, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient) get(urlStr string, timeout time.Duration, header *HttpHeader) (string, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 	urlObj, err := url.Parse(urlStr)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
-	jar.SetCookies(urlObj, this.HttpHeader.Cookies)
+	jar.SetCookies(urlObj, this.Cookies)
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: func(netw, addr string) (net.Conn, error) {
@@ -58,66 +58,75 @@ func (this *HttpClient) get(urlStr string, timeout time.Duration) (string, []*ht
 	}
 	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return ``, nil, err
+		return ``, err
 	}
 
-	if this.HttpHeader.Host != "" {
-		req.Host = this.HttpHeader.Host
+	if header.Host != "" {
+		req.Host = header.Host
 	}
 
-	if this.HttpHeader.Accept != "" {
-		req.Header.Add("Accept", this.HttpHeader.Accept)
+	if header.Accept != "" {
+		req.Header.Add("Accept", header.Accept)
 	}
 
-	if this.HttpHeader.AcceptEncoding != "" {
-		req.Header.Add("Accept-Encoding", this.HttpHeader.AcceptEncoding)
+	if header.AcceptEncoding != "" {
+		req.Header.Add("Accept-Encoding", header.AcceptEncoding)
 	}
-	if this.HttpHeader.AcceptLanguage != "" {
-		req.Header.Add("Accept-Language", this.HttpHeader.AcceptLanguage)
-	}
-
-	if this.HttpHeader.Connection != "" {
-		req.Header.Add("Connection", this.HttpHeader.Connection)
+	if header.AcceptLanguage != "" {
+		req.Header.Add("Accept-Language", header.AcceptLanguage)
 	}
 
-	if this.HttpHeader.ContentType != "" {
-		req.Header.Add("Content-Type", this.HttpHeader.ContentType)
+	if header.Connection != "" {
+		req.Header.Add("Connection", header.Connection)
 	}
 
-	if this.HttpHeader.ContentLength != "" {
-		req.Header.Add("Content-Length", this.HttpHeader.ContentLength)
+	if header.ContentType != "" {
+		req.Header.Add("Content-Type", header.ContentType)
 	}
 
-	if this.HttpHeader.Referer != "" {
-		req.Header.Add("Referer", this.HttpHeader.Referer)
+	if header.ContentLength != "" {
+		req.Header.Add("Content-Length", header.ContentLength)
 	}
 
-	if this.HttpHeader.UpgradeInsecureRequests != "" {
-		req.Header.Add("Upgrade-Insecure-Requests", this.HttpHeader.UpgradeInsecureRequests)
+	if header.Referer != "" {
+		req.Header.Add("Referer", header.Referer)
+	}
+
+	if header.UpgradeInsecureRequests != "" {
+		req.Header.Add("Upgrade-Insecure-Requests", header.UpgradeInsecureRequests)
 	}
 
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
 
 	resp, err := client.Do(req)
 	if (err != nil && err.Error() != "Get /: Cannot Redirect") {
-		return ``, nil, err
+		return ``, err
+	}
+
+	if len(resp.Cookies()) > 0 {
+		cookies := resp.Cookies()
+		for _, v := range cookies {
+			this.Cookies = append(this.Cookies, v)
+		}
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	return string(body), resp.Cookies(), nil
+	return string(body), nil
 }
 
-func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration) (string, []*http.Cookie, error) {
+func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration, header *HttpHeader) (string, error) {
+
 	jar, err := cookiejar.New(nil)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 	urlObj, err := url.Parse(urlStr)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
-	jar.SetCookies(urlObj, this.HttpHeader.Cookies)
+	jar.SetCookies(urlObj, this.Cookies)
+
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial: func(netw, addr string) (net.Conn, error) {
@@ -136,53 +145,61 @@ func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration) 
 		},
 		Jar: jar,
 	}
+
 	req, err := http.NewRequest("POST", urlStr, bytes.NewReader(data))
 	if err != nil {
-		return ``, nil, err
+		return ``, err
 	}
-	if this.HttpHeader.Host != "" {
-		req.Host = this.HttpHeader.Host
-	}
-
-	if this.HttpHeader.Accept != "" {
-		req.Header.Add("Referer", this.HttpHeader.Accept)
+	if header.Host != "" {
+		req.Host = header.Host
 	}
 
-	if this.HttpHeader.AcceptEncoding != "" {
-		req.Header.Add("Accept-Encoding", this.HttpHeader.AcceptEncoding)
-	}
-	if this.HttpHeader.AcceptLanguage != "" {
-		req.Header.Add("Accept-Language", this.HttpHeader.AcceptLanguage)
+	if header.Accept != "" {
+		req.Header.Add("Accept", header.Accept)
 	}
 
-	if this.HttpHeader.Connection != "" {
-		req.Header.Add("Connection", this.HttpHeader.Connection)
+	if header.AcceptEncoding != "" {
+		req.Header.Add("Accept-Encoding", header.AcceptEncoding)
+	}
+	if header.AcceptLanguage != "" {
+		req.Header.Add("Accept-Language", header.AcceptLanguage)
 	}
 
-	if this.HttpHeader.ContentType != "" {
-		req.Header.Add("Content-Type", this.HttpHeader.ContentType)
+	if header.Connection != "" {
+		req.Header.Add("Connection", header.Connection)
 	}
 
-	if this.HttpHeader.Host != "" {
-		req.Header.Add("Host", this.HttpHeader.Host)
+	if header.ContentType != "" {
+		req.Header.Add("Content-Type", header.ContentType)
 	}
 
-	if this.HttpHeader.Referer != "" {
-		req.Header.Add("Referer", this.HttpHeader.Referer)
+	if header.ContentLength != "" {
+		req.Header.Add("Content-Length", header.ContentLength)
 	}
 
-	if this.HttpHeader.UpgradeInsecureRequests != "" {
-		req.Header.Add("Upgrade-Insecure-Requests", this.HttpHeader.UpgradeInsecureRequests)
+	if header.Referer != "" {
+		req.Header.Add("Referer", header.Referer)
+	}
+
+	if header.UpgradeInsecureRequests != "" {
+		req.Header.Add("Upgrade-Insecure-Requests", header.UpgradeInsecureRequests)
 	}
 
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
 
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
+
+	if len(resp.Cookies()) > 0 {
+		cookies := resp.Cookies()
+		for _, v := range cookies {
+			this.Cookies = append(this.Cookies, v)
+		}
+	}
 	if (err != nil && err.Error() != "Get /: Cannot Redirect") {
-		return ``, nil, err
+		return ``, err
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	return string(body), resp.Cookies(), nil
+	return string(body), nil
 }
