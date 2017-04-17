@@ -23,7 +23,7 @@ type  Wechat struct {
 	utils				Utils
 	httpClient			HttpClient
 	storage				Storage
-	listener			Listener
+	handlers			map[EventType]func(Event)
 }
 
 type Option struct {
@@ -67,6 +67,7 @@ func NewWechat(option Option) *Wechat{
 		utils: Utils{},
 		httpClient: HttpClient{},
 		storage: storage,
+		handlers: map[EventType]func(Event){},
 	}
 }
 
@@ -278,11 +279,10 @@ func (this *Wechat) init() error {
 	return nil
 }
 
-func (this *Wechat) SetListener(listener Listener) *Wechat {
-	this.listener = listener
-	return this
-}
-
 func (this *Wechat) skeyKV() string {
 	return fmt.Sprintf(`skey=%s`, this.baseRequest.Skey)
+}
+
+func (this *Wechat) Handle(eventType EventType, handler func(Event)) {
+	this.handlers[eventType] = handler
 }

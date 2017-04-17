@@ -19,7 +19,6 @@ const (
 )
 
 type Event struct {
-	Type EventType
 	Time int64
 	Data interface{}
 }
@@ -57,10 +56,6 @@ type SenderUserInfo struct {
 	UserName	string
 	NickName	string
 	ContactType ContactType	// 发送人类型(好友，群成员，好友兼群成员)
-}
-
-type Listener interface {
-	Handle(event Event) error
 }
 
 func (this *Wechat) handleSyncResponse(resp *syncMessageResponse) {
@@ -234,12 +229,14 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 	}
 
 	event := Event {
-		Type:	MsgEvent,
 		Time:	time.Now().Unix(),
 		Data:	data,
 	}
 
-	this.listener.Handle(event)
+	handler, found := this.handlers[MsgEvent]
+	if found {
+		handler(event)
+	}
 }
 
 func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, userName string) {
@@ -248,9 +245,11 @@ func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, 
 		UserName:	userName,
 	}
 
-	this.listener.Handle(Event{
-		Type: ContactChangeEvent,
-		Time: time.Now().Unix(),
-		Data: data,
-	})
+	handler, found := this.handlers[ContactChangeEvent]
+	if found {
+		handler(Event{
+			Time: time.Now().Unix(),
+			Data: data,
+		})
+	}
 }
