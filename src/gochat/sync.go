@@ -58,9 +58,7 @@ func (this *Wechat) beginSync() error {
 
 				if resp.ModContactCount > 0 {
 					_, err := this.contactsModify(resp.ModContactList)
-					if err != nil {
-
-					}
+					if err != nil {}
 				}
 
 				if resp.DelContactCount > 0 {
@@ -79,7 +77,9 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 
 	syncKeyf := make(map[string]interface{}, 0)
 	keys := strings.Split(this.formattedSyncCheckKey(), "|")
+
 	syncKeyf["Count"] = len(keys)
+
 	list := make([]map[string]int64, 0)
 
 	for _, key := range keys {
@@ -89,7 +89,6 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 		kvmap := map[string]int64{"Key": k, "Val": v}
 		list = append(list, kvmap)
 	}
-
 	syncKeyf["List"] = list
 	data, err := json.Marshal(syncMessageRequest{
 		BaseRequest: this.baseRequest,

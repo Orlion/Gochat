@@ -16,7 +16,7 @@ type sendMsgResponse struct {
 	LocalID string
 }
 
-func (this *Wechat) sendTextMsg(content string, to string) (bool, error) {
+func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 	sendMsgApi := strings.Replace(Config["sendmsg_api"], "{pass_ticket}", this.passTicket, 1)
 
 	msgId := this.utils.getUnixMsTime() + strconv.Itoa(rand.Intn(10000))

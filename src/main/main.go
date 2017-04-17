@@ -5,28 +5,28 @@ import (
 	"fmt"
 )
 
-type myListener struct {
+type MyListener struct {
 
 }
 
-func (this *myListener) handle(event gochat.Event) error {
-	fmt.Println(event.Type)
+func (this *MyListener) Handle(event gochat.Event) error {
+	if event.Type == gochat.MsgEvent{
+		msgEventData, ok := event.Data.(gochat.MsgEventData)
+		if ok {
+			fmt.Println(msgEventData.Content)
+		}
+	}
 	return nil
 }
 
 func main() {
 
-	v := interface{}(&myListener{})
-	h, ok := v.(gochat.Listener)
-	if ok {
-		fmt.Println("a")
-	} else {
-		wechat := gochat.NewWechat(gochat.Option{
-			StorageDirPath: "",
-		})
-		err := wechat.SetListener(h).Run()
-		if err != nil {
-			fmt.Println(err)
-		}
+	wechat := gochat.NewWechat(gochat.Option{
+		StorageDirPath: "D:/develop/",
+	})
+	var listener gochat.Listener = new(MyListener)
+	err := wechat.SetListener(listener).Run()
+	if err != nil {
+		fmt.Println(err)
 	}
 }

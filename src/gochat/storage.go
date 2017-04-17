@@ -11,19 +11,19 @@ type Storage struct {
 	storageDirPath string
 }
 
-type StorageData struct {
+type storageData struct {
 	Uuid 		string
-	baseRequest BaseRequest
-	passTicket 	string
-	cookies 	[]*http.Cookie
+	BaseRequest BaseRequest
+	PassTicket 	string
+	Cookies 	[]*http.Cookie
 }
 
 func (this *Storage) setData(Uuid string, baseRequest BaseRequest, passTicket string, cookies []*http.Cookie) error {
-	storageStr, _ := json.Marshal(StorageData {
+	storageStr, _ := json.Marshal(storageData {
 		Uuid:			Uuid,
-		baseRequest: 	baseRequest,
-		passTicket: 	passTicket,
-		cookies: 		cookies,
+		BaseRequest: 	baseRequest,
+		PassTicket: 	passTicket,
+		Cookies: 		cookies,
 	})
 
 	fileName := this.storageDirPath + "storage_data.json"
@@ -45,11 +45,17 @@ func (this *Storage) getData() (string, BaseRequest, string, []*http.Cookie, err
 	if err != nil {
 		return "", BaseRequest{}, "", nil, err
 	}
-	var storageData StorageData
+	var storageData storageData
 	err = json.Unmarshal(bs, &storageData)
 	if err != nil {
 		return "", BaseRequest{}, "", nil, err
 	}
 
-	return storageData.Uuid, storageData.baseRequest, storageData.passTicket, storageData.cookies, nil
+	return storageData.Uuid, storageData.BaseRequest, storageData.PassTicket, storageData.Cookies, nil
+}
+
+func (this *Storage) delData() error {
+	fileName := this.storageDirPath + "storage_data.json"
+	err := os.Remove(fileName)
+	return err
 }

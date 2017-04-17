@@ -60,7 +60,7 @@ type SenderUserInfo struct {
 }
 
 type Listener interface {
-	handle(event Event) error
+	Handle(event Event) error
 }
 
 func (this *Wechat) handleSyncResponse(resp *syncMessageResponse) {
@@ -104,6 +104,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 	if len(groupUserName) > 0 {
 		isGroupMsg = true
 	}
+
 	msgType := msg["MsgType"].(float64)
 	mid := msg["MsgId"].(string)
 
@@ -156,9 +157,16 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 			isSendByMySelf = true
 		}
 
-		contact, found  := this.contacts[fromUserName].MemberMap[infos[0]] // 根据content中UserName(消息发布人)找到详细数据
-		if !found {
-			// 需要更新群组
+		contact := &Memeber{}
+		for {
+			fromGroup, found := this.contacts[fromUserName]
+			if found {
+				contact, found  = fromGroup.MemberMap[infos[0]] // 根据content中UserName(消息发布人)找到详细数据
+				if found {
+					break
+				}
+			}
+
 			_,err := this.updateOrAddContact([]string{fromUserName})
 			if err != nil {
 				return
@@ -170,6 +178,10 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 			}
 		}
 
+		if nil == contact {
+			return
+		}
+
 		senderUserName = infos[0] // 实际发布人
 		senderUserInfo = SenderUserInfo{
 			UserName: infos[0],
@@ -178,7 +190,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		}
 
 	} else {
-		isSendByMySelf = fromUserName == toUserName
+		isSendByMySelf = fromUserName == this.me.UserName
 		if isSendByMySelf {
 			senderUserInfo = SenderUserInfo{
 				UserName: senderUserName,
@@ -194,6 +206,16 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		}
 	}
 
+	fromUserInfo := this.me
+	if !isSendByMySelf {
+		fromUserInfo = *this.contacts[fromUserName]
+	}
+
+	toUserInfo := this.me
+	if toUserName != this.me.UserName {
+		toUserInfo = *this.contacts[toUserName]
+	}
+
 	data := MsgEventData {
 		IsGroupMsg:		isGroupMsg,
 		IsMediaMsg:		isMediaMsg,
@@ -203,11 +225,11 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		MediaUrl:		mediaUrl,
 		Content:		content,
 		FromUserName:	fromUserName,
-		FromUserInfo:	*this.contacts[fromUserName],
+		FromUserInfo:	fromUserInfo,
 		SenderUserName:	senderUserName,
 		SenderUserInfo:	senderUserInfo,
 		ToUserName:		toUserName,
-		ToUserInfo:		*this.contacts[toUserName],
+		ToUserInfo:		toUserInfo,
 		OriginalMsg:	msg,
 	}
 
@@ -217,7 +239,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		Data:	data,
 	}
 
-	this.listener.handle(event)
+	this.listener.Handle(event)
 }
 
 func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, userName string) {
@@ -226,7 +248,7 @@ func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, 
 		UserName:	userName,
 	}
 
-	this.listener.handle(Event{
+	this.listener.Handle(Event{
 		Type: ContactChangeEvent,
 		Time: time.Now().Unix(),
 		Data: data,

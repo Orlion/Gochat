@@ -77,43 +77,28 @@ func (this *Wechat) Run() error {
 
 	var err error
 	this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, err = this.storage.getData()
-	if err != nil {
-		getUuidApiUrl := Config["get_uuid_api"] + this.utils.getUnixMsTime()
-		content, err := this.httpClient.get(getUuidApiUrl, time.Second * 5, &HttpHeader{
-			Accept: 			"*/*",
-			AcceptEncoding: 	"gzip, deflate, br",
-			AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-			Connection: 		"keep-alive",
-			Host: 				"login.wx2.qq.com",
-			Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
-		})
-		if err != nil {
-			return err
-		}
-
-		reg, err := regexp.Compile(`window.QRLogin.code = 200; window.QRLogin.uuid = "(.+)"`)
-		if err != nil {
-			return err
-		}
-		uuid := reg.FindSubmatch([]byte(content))
-		if len(uuid) != 2 {
-			return errors.New("Uuid get failed")
-		}
-		this.Uuid = string(uuid[1])
-		fmt.Println("https://login.weixin.qq.com/qrcode/" + this.Uuid)
-
+	if err != nil || "" == this.passTicket{
 		err = this.login()
 		if err != nil {
 			return err
 		}
-	}
 
+		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
+	}
 	err = this.init()
+	if err != nil || "" == this.baseRequest.Skey {
+		err = this.login()
+		if err != nil {
+			return err
+		}
+
+		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
+	}
+	// 初始化通讯录
+	err = this.initContact()
 	if err != nil {
 		return err
 	}
-
-	return this.initContact()
 
 	this.beginSync()
 
@@ -121,6 +106,30 @@ func (this *Wechat) Run() error {
 }
 
 func (this *Wechat) login() error {
+	getUuidApiUrl := Config["get_uuid_api"] + this.utils.getUnixMsTime()
+	content, err := this.httpClient.get(getUuidApiUrl, time.Second * 5, &HttpHeader{
+		Accept: 			"*/*",
+		AcceptEncoding: 	"gzip, deflate, br",
+		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+		Connection: 		"keep-alive",
+		Host: 				"login.wx2.qq.com",
+		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+	})
+	if err != nil {
+		return err
+	}
+
+	reg, err := regexp.Compile(`window.QRLogin.code = 200; window.QRLogin.uuid = "(.+)"`)
+	if err != nil {
+		return err
+	}
+	uuid := reg.FindSubmatch([]byte(content))
+	if len(uuid) != 2 {
+		return errors.New("Uuid get failed")
+	}
+	this.Uuid = string(uuid[1])
+	fmt.Println("https://login.weixin.qq.com/qrcode/" + this.Uuid)
+
 	var tip int = 1
 	for  {
 		redirectUrl, err := this.polling(tip)
@@ -144,6 +153,8 @@ func (this *Wechat) login() error {
 		if err != nil {
 			return err
 		}
+
+		return nil
 	}
 }
 
@@ -200,7 +211,6 @@ func (this *Wechat) doLogin(redirectUrl string) error {
 		return err
 	}
 	this.baseRequest, this.passTicket, err = this.analysisLoginXml(content)
-	this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
 
 	return err
 }
@@ -264,6 +274,7 @@ func (this *Wechat) init() error {
 	this.me = initres.User
 	this.baseRequest.Skey = initres.Skey
 	this.syncKey = initres.SyncKey
+
 	return nil
 }
 
