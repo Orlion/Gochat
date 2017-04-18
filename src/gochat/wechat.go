@@ -78,29 +78,36 @@ func (this *Wechat) Run() error {
 
 	var err error
 	this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, err = this.storage.getData()
+	isLogin := false
 	if err != nil || "" == this.passTicket{
 		err = this.login()
+		isLogin = true
 		if err != nil {
 			return err
 		}
-
 		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
 	}
 	err = this.init()
 	if err != nil || "" == this.baseRequest.Skey {
-		err = this.login()
-		if err != nil {
-			return err
+		if (isLogin) {
+			return errors.New("Login failed")
+		} else {
+			err = this.login()
+			if err != nil {
+				return err
+			}
+			this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
+			err = this.init()
+			if err != nil {
+				return err
+			}
 		}
-
-		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
 	}
 	// 初始化通讯录
 	err = this.initContact()
 	if err != nil {
 		return err
 	}
-
 	this.beginSync()
 
 	return nil
@@ -135,7 +142,6 @@ func (this *Wechat) login() error {
 	for  {
 		redirectUrl, err := this.polling(tip)
 		if err != nil {
-			fmt.Println(err)
 			time.Sleep(time.Second * time.Duration(1))
 			continue
 		}
@@ -145,7 +151,6 @@ func (this *Wechat) login() error {
 		}
 
 		if "201" == redirectUrl {
-			fmt.Println("已扫码,请确认.")
 			tip = 0
 			continue
 		}
@@ -211,6 +216,7 @@ func (this *Wechat) doLogin(redirectUrl string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(content)
 	this.baseRequest, this.passTicket, err = this.analysisLoginXml(content)
 
 	return err
@@ -252,21 +258,22 @@ func (this *Wechat) init() error {
 	type initRequest struct {
 		BaseRequest BaseRequest
 	}
+	this.baseRequest.Skey = ""
 	postData, err := json.Marshal(initRequest{
 		BaseRequest: this.baseRequest,
 	})
 	if err != nil {
 		return err
 	}
-
+	fmt.Println(this.baseRequest.Skey)
 	content, err := this.httpClient.post(wxInitApi, postData, time.Second * 5, &HttpHeader{
 		Host: 				"login.wx2.qq.com",
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
+	fmt.Println(content)
 	if err != nil {
 		return err
 	}
-
 	var initres initResp
 	err = json.Unmarshal([]byte(content), &initres)
 	if err != nil {

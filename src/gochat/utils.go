@@ -35,3 +35,12 @@ func (this *Utils) cookies2String(cookies []*http.Cookie) string{
 
 	return result
 }
+
+func (this *Utils) userName2Id(userName string) string {
+	r := ""
+	for _,v := range []byte(userName) {
+		r += strconv.Itoa(int(v))
+	}
+
+	return r
+}

@@ -119,10 +119,10 @@ func (this *Wechat) initContact() error {
 
 	groups, _ := this.fetchContacts(groupUserNames)
 	for _, group := range groups {
+		group.MemberMap = map[string]*Memeber{}
 		for _, contact := range group.MemberList {
 			group.MemberMap[contact.UserName] = contact
 		}
-
 		this.contacts[group.UserName] = &group
 	}
 
@@ -180,10 +180,6 @@ func (this *Wechat) fetchContacts(userNames []string) ([]Contact, error) {
 
 	batchGetcontactApi := strings.Replace(Config["batchgetcontact_api"], "{r}", this.utils.getUnixMsTime(), 1)
 	content, err := this.httpClient.post(batchGetcontactApi, data, time.Second * 5, &HttpHeader{
-		Accept: 			"application/json, text/plain, */*",
-		AcceptEncoding: 	"gzip, deflate, br",
-		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-		Connection: 		"keep-alive",
 		Host: 				"wx2.qq.com",
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
@@ -211,8 +207,9 @@ func (this *Wechat) updateOrAddContact(userNames []string) (int, error) {
 	}
 
 	for _, contact := range contacts {
+		contact.MemberMap = map[string]*Memeber{}
 		for _, member := range contact.MemberList {
-			contact.MemberMap[contact.UserName] = member
+			contact.MemberMap[member.UserName] = member
 		}
 
 		if contact.VerifyFlag / 8 != 0 {

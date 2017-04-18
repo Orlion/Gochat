@@ -35,6 +35,7 @@ type MsgEventData struct{
 	FromUserInfo     Contact
 	SenderUserName   string
 	SenderUserInfo   SenderUserInfo
+	SenderUserId	 string
 	ToUserName       string
 	ToUserInfo       Contact
 	OriginalMsg      map[string]interface{}
@@ -211,6 +212,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		toUserInfo = *this.contacts[toUserName]
 	}
 
+	senderUserId := this.utils.userName2Id(senderUserName)
 	data := MsgEventData {
 		IsGroupMsg:		isGroupMsg,
 		IsMediaMsg:		isMediaMsg,
@@ -223,6 +225,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		FromUserInfo:	fromUserInfo,
 		SenderUserName:	senderUserName,
 		SenderUserInfo:	senderUserInfo,
+		SenderUserId:   senderUserId,
 		ToUserName:		toUserName,
 		ToUserInfo:		toUserInfo,
 		OriginalMsg:	msg,

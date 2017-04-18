@@ -28,6 +28,7 @@ func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 		"ClientMsgId":	msgId,
 		"Type":			"1",
 	}
+
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
 	enc.SetEscapeHTML(false)

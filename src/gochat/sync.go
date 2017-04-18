@@ -81,8 +81,8 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 	syncKeyf["Count"] = len(keys)
 
 	list := make([]map[string]int64, 0)
-
 	for _, key := range keys {
+		fmt.Println(key)
 		kv := strings.Split(key, "_")
 		k, _ := strconv.ParseInt(kv[0], 10, 64)
 		v, _ := strconv.ParseInt(kv[1], 10, 64)
