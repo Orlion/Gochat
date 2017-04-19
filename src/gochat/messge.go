@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 type sendMsgResponse struct {
@@ -18,7 +19,7 @@ type sendMsgResponse struct {
 
 func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 	sendMsgApi := strings.Replace(Config["sendmsg_api"], "{pass_ticket}", this.passTicket, 1)
-
+	sendMsgApi = strings.Replace(sendMsgApi, "{host}", this.host, 1)
 	msgId := this.utils.getUnixMsTime() + strconv.Itoa(rand.Intn(10000))
 	msg := map[string]interface{} {
 		"Content":		content,
@@ -51,7 +52,8 @@ func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 		Host: 				"login.wx2.qq.com",
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
-
+	fmt.Println(this.host)
+	fmt.Println(respContent)
 	var resp sendMsgResponse
 	err = json.Unmarshal([]byte(respContent), &resp)
 	if err != nil {

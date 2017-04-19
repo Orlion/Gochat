@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"errors"
+	"log"
 )
 
 type syncMessageRequest struct {
@@ -42,7 +43,7 @@ func (this *Wechat) beginSync() error {
 		}
 
 		if code != "0" {
-			return errors.New("Syncing failed, please relogin. [code]:" + code)
+			log.Println(errors.New("Syncing failed, please relogin. [code]:" + code))
 		}
 
 		// 接收到了消息
@@ -74,6 +75,7 @@ func (this *Wechat) beginSync() error {
 func (this *Wechat) sync() (*syncMessageResponse, error) {
 	syncApi := strings.Replace(Config["sync_api"], "{sid}", this.baseRequest.Sid, 1)
 	syncApi = strings.Replace(syncApi, "{skey}", this.baseRequest.Skey, 1)
+	syncApi = strings.Replace(syncApi, "{host}", this.host, 1)
 
 	syncKeyf := make(map[string]interface{}, 0)
 	keys := strings.Split(this.formattedSyncCheckKey(), "|")
@@ -82,7 +84,6 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 
 	list := make([]map[string]int64, 0)
 	for _, key := range keys {
-		fmt.Println(key)
 		kv := strings.Split(key, "_")
 		k, _ := strconv.ParseInt(kv[0], 10, 64)
 		v, _ := strconv.ParseInt(kv[1], 10, 64)
@@ -102,13 +103,12 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 
 	content, err := this.httpClient.post(syncApi, data, time.Second * 5, &HttpHeader{
 		ContentType:		"application/json;charset=utf-8",
-		Host: 				"wx2.qq.com",
+		Host: 				this.host,
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
 	if err != nil {
 		return nil, err
 	}
-
 	var smr syncMessageResponse
 	err = json.Unmarshal([]byte(content), &smr)
 	if err != nil {
@@ -125,23 +125,47 @@ func (this *Wechat) sync() (*syncMessageResponse, error) {
 }
 
 func (this *Wechat) syncCheck() (string, string, error) {
-	hosts := [...]string{
-		`webpush.wx2.qq.com`,
-		`webpush.wx.qq.com`,
-		`wx2.qq.com`,
-		`wx8.qq.com`,
-		`webpush.wx8.qq.com`,
-		`qq.com`,
-		`webpush.wx.qq.com`,
-		`web2.wechat.com`,
-		`webpush.web2.wechat.com`,
-		`wechat.com`,
-		`webpush.web.wechat.com`,
-		`webpush.weixin.qq.com`,
-		`webpush.wechat.com`,
-		`webpush1.wechat.com`,
-		`webpush2.wechat.com`,
-		`webpush2.wx.qq.com`,
+	hosts := []string{}
+	if this.host == "wx.qq.com" {
+		hosts = []string{
+			`wx.qq.com`,
+			`webpush.wx2.qq.com`,
+			`webpush.wx.qq.com`,
+			`wx2.qq.com`,
+			`wx8.qq.com`,
+			`webpush.wx8.qq.com`,
+			`qq.com`,
+			`webpush.wx.qq.com`,
+			`web2.wechat.com`,
+			`webpush.web2.wechat.com`,
+			`wechat.com`,
+			`webpush.web.wechat.com`,
+			`webpush.weixin.qq.com`,
+			`webpush.wechat.com`,
+			`webpush1.wechat.com`,
+			`webpush2.wechat.com`,
+			`webpush2.wx.qq.com`,
+		}
+	} else {
+		hosts = []string{
+			`webpush.wx2.qq.com`,
+			`wx.qq.com`,
+			`webpush.wx.qq.com`,
+			`wx2.qq.com`,
+			`wx8.qq.com`,
+			`webpush.wx8.qq.com`,
+			`qq.com`,
+			`webpush.wx.qq.com`,
+			`web2.wechat.com`,
+			`webpush.web2.wechat.com`,
+			`wechat.com`,
+			`webpush.web.wechat.com`,
+			`webpush.weixin.qq.com`,
+			`webpush.wechat.com`,
+			`webpush1.wechat.com`,
+			`webpush2.wechat.com`,
+			`webpush2.wx.qq.com`,
+		}
 	}
 
 	for _, host := range hosts {
@@ -164,7 +188,6 @@ func (this *Wechat) syncCheck() (string, string, error) {
 		if err != err {
 			return "", "", err
 		}
-
 		code, selector, err := this.analysisSelector(syncCheckResContent)
 		if err != nil {
 			return "", "", err

@@ -22,6 +22,7 @@ type HttpHeader struct {
 	Connection string
 	ContentType string
 	ContentLength string
+	Origin string
 	Host string
 	Referer string
 	UpgradeInsecureRequests string
@@ -176,6 +177,10 @@ func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration, 
 		req.Header.Add("Content-Length", header.ContentLength)
 	}
 
+	if header.Origin != "" {
+		req.Header.Add("Content-Length", header.Origin)
+	}
+
 	if header.Referer != "" {
 		req.Header.Add("Referer", header.Referer)
 	}
@@ -187,6 +192,9 @@ func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration, 
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
 
 	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
 	defer resp.Body.Close()
 
 	if len(resp.Cookies()) > 0 {
@@ -196,7 +204,7 @@ func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration, 
 		}
 	}
 	if (err != nil && err.Error() != "Get /: Cannot Redirect") {
-		return ``, err
+		return "", err
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)

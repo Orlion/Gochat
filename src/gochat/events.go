@@ -88,7 +88,6 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 	content := msg["Content"].(string)
 	isSendByMySelf := false
 	senderUserInfo := SenderUserInfo{}
-
 	var groupUserName string
 	if strings.HasPrefix(fromUserName, "@@") {	// 消息来自于群
 		groupUserName = fromUserName
@@ -186,6 +185,7 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		}
 
 	} else {
+
 		isSendByMySelf = fromUserName == this.me.UserName
 		if isSendByMySelf {
 			senderUserInfo = SenderUserInfo{
@@ -235,7 +235,6 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		Time:	time.Now().Unix(),
 		Data:	data,
 	}
-
 	handler, found := this.handlers[MsgEvent]
 	if found {
 		handler(event)

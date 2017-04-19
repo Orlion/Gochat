@@ -135,6 +135,7 @@ func (this *Wechat) getContacts(seq float64) ([]Contact, float64, error) {
 	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{seq}", strconv.FormatInt(int64(seq), 10), 1)
 	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{skey}", this.baseRequest.Skey, 1)
 	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{r}", this.utils.getUnixTime(), 1)
+	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{host}", this.host, 1)
 
 	content, err := this.httpClient.get(getContactsApiUrl, time.Second * 5, &HttpHeader{
 		Accept: 			"application/json, text/plain, */*",
@@ -179,8 +180,9 @@ func (this *Wechat) fetchContacts(userNames []string) ([]Contact, error) {
 	}
 
 	batchGetcontactApi := strings.Replace(Config["batchgetcontact_api"], "{r}", this.utils.getUnixMsTime(), 1)
+	batchGetcontactApi = strings.Replace(batchGetcontactApi, "{host}", this.host, 1)
 	content, err := this.httpClient.post(batchGetcontactApi, data, time.Second * 5, &HttpHeader{
-		Host: 				"wx2.qq.com",
+		Host: 				this.host,
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
 

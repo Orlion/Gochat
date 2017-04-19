@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 	"net/http"
+	"net/url"
 )
 
 type Utils struct {
@@ -43,4 +44,13 @@ func (this *Utils) userName2Id(userName string) string {
 	}
 
 	return r
+}
+
+func (this *Utils) getHostByUrl(urlStr string) string {
+	u, err := url.Parse(urlStr)
+	if err != nil {
+		return "wx2.qq.com"
+	}
+
+	return u.Host
 }

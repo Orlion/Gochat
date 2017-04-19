@@ -20,6 +20,7 @@ type  Wechat struct {
 	contacts			map[string]*Contact		// 处理后的联系人列表: UserName => Contact
 	syncKey   			map[string]interface{}
 	syncHost			string
+	host     			string
 	utils				Utils
 	httpClient			HttpClient
 	storage				Storage
@@ -77,7 +78,7 @@ func NewWechat(option Option) *Wechat{
 func (this *Wechat) Run() error {
 
 	var err error
-	this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, err = this.storage.getData()
+	this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, this.host, err = this.storage.getData()
 	isLogin := false
 	if err != nil || "" == this.passTicket{
 		err = this.login()
@@ -85,10 +86,13 @@ func (this *Wechat) Run() error {
 		if err != nil {
 			return err
 		}
-		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
+		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, this.host)
+	} else {
+		this.storage.delData()
 	}
 	err = this.init()
-	if err != nil || "" == this.baseRequest.Skey {
+	if err != nil {
+		this.storage.delData()
 		if (isLogin) {
 			return errors.New("Login failed")
 		} else {
@@ -96,7 +100,7 @@ func (this *Wechat) Run() error {
 			if err != nil {
 				return err
 			}
-			this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies)
+			this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, this.host)
 			err = this.init()
 			if err != nil {
 				return err
@@ -155,6 +159,7 @@ func (this *Wechat) login() error {
 			continue
 		}
 
+		this.host = this.utils.getHostByUrl(redirectUrl)
 		err = this.doLogin(redirectUrl)
 		if err != nil {
 			return err
@@ -210,13 +215,12 @@ func (this *Wechat) doLogin(redirectUrl string) error {
 		AcceptEncoding: 	"gzip, deflate, br",
 		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
 		Connection: 		"keep-alive",
-		Host: 				"wx2.qq.com",
+		Host: 				this.host,
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
 	if err != nil {
 		return err
 	}
-	fmt.Println(content)
 	this.baseRequest, this.passTicket, err = this.analysisLoginXml(content)
 
 	return err
@@ -255,33 +259,41 @@ func (this *Wechat) analysisLoginXml(xmlStr string) (BaseRequest, string, error)
 
 func (this *Wechat) init() error {
 	wxInitApi := strings.Replace(Config["wx_init_api"], "{r}", strconv.Itoa(int(time.Now().Unix())), 1)
+	wxInitApi = strings.Replace(wxInitApi, "{host}", this.host, 1)
+	wxInitApi = strings.Replace(wxInitApi, "{pass_ticket}", this.passTicket, 1)
 	type initRequest struct {
 		BaseRequest BaseRequest
 	}
-	this.baseRequest.Skey = ""
 	postData, err := json.Marshal(initRequest{
 		BaseRequest: this.baseRequest,
 	})
 	if err != nil {
 		return err
 	}
-	fmt.Println(this.baseRequest.Skey)
+
 	content, err := this.httpClient.post(wxInitApi, postData, time.Second * 5, &HttpHeader{
+		Accept:				"application/json, text/plain, */*",
+		ContentType:		"application/json;charset=UTF-8",
+		Origin:				"https://wx.qq.com",
 		Host: 				"login.wx2.qq.com",
 		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
 	})
-	fmt.Println(content)
 	if err != nil {
 		return err
 	}
+
 	var initres initResp
 	err = json.Unmarshal([]byte(content), &initres)
 	if err != nil {
-		return nil
+		return err
 	}
-	this.me = initres.User
-	this.baseRequest.Skey = initres.Skey
-	this.syncKey = initres.SyncKey
+	if initres.Response.BaseResponse.Ret == 0 {
+		this.me = initres.User
+		this.baseRequest.Skey = initres.Skey
+		this.syncKey = initres.SyncKey
+	} else {
+
+	}
 
 	return nil
 }
