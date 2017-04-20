@@ -178,7 +178,7 @@ func (this *HttpClient) post(urlStr string, data []byte, timeout time.Duration, 
 	}
 
 	if header.Origin != "" {
-		req.Header.Add("Content-Length", header.Origin)
+		req.Header.Add("Origin", header.Origin)
 	}
 
 	if header.Referer != "" {

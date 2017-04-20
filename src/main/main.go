@@ -30,7 +30,8 @@ func main() {
 				}
 			} else {
 				res, err := tuling(eventData.Content, eventData.FromUserInfo.City, eventData.SenderUserId)
-				if err != nil {
+				fmt.Println(res)
+				if err != nil || res == ""{
 					wechat.SendTextMsg("短路了...快通知我主人修修我...", eventData.SenderUserName)
 				} else {
 					wechat.SendTextMsg(res, eventData.SenderUserName)
@@ -73,7 +74,7 @@ func tuling(input string, city string, userId string) (string, error) {
 
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	type Resp struct {
 		Intent interface{}
 		Results []struct{
@@ -81,6 +82,7 @@ func tuling(input string, city string, userId string) (string, error) {
 			Values	map[string]string
 		}
 	}
+	fmt.Println(string(body))
 	var tulingResp = new(Resp)
 	err = json.Unmarshal(body, &tulingResp)
 	if err != nil {

@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 type sendMsgResponse struct {
@@ -20,6 +19,7 @@ type sendMsgResponse struct {
 func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 	sendMsgApi := strings.Replace(Config["sendmsg_api"], "{pass_ticket}", this.passTicket, 1)
 	sendMsgApi = strings.Replace(sendMsgApi, "{host}", this.host, 1)
+
 	msgId := this.utils.getUnixMsTime() + strconv.Itoa(rand.Intn(10000))
 	msg := map[string]interface{} {
 		"Content":		content,
@@ -27,9 +27,8 @@ func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 		"FromUserName": this.me.UserName,
 		"LocalID":		msgId,
 		"ClientMsgId":	msgId,
-		"Type":			"1",
+		"Type":			1,
 	}
-
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
 	enc.SetEscapeHTML(false)
@@ -44,16 +43,10 @@ func (this *Wechat) SendTextMsg(content string, to string) (bool, error) {
 	}
 
 	respContent, err := this.httpClient.post(sendMsgApi, []byte(buffer.String()), time.Second * 5, &HttpHeader{
-		Accept: 			"application/json, text/plain, */*",
-		AcceptEncoding: 	"gzip, deflate, br",
-		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-		Connection: 		"keep-alive",
 		ContentType:		"application/json;charset=utf-8",
-		Host: 				"login.wx2.qq.com",
-		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+		Host: 				this.host,
+		Referer: 			"https://"+ this.host +"/?&lang=zh_CN",
 	})
-	fmt.Println(this.host)
-	fmt.Println(respContent)
 	var resp sendMsgResponse
 	err = json.Unmarshal([]byte(respContent), &resp)
 	if err != nil {
