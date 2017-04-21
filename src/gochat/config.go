@@ -12,6 +12,14 @@ var Config = map[string]string {
 	"sync_api": 			"https://{host}/cgi-bin/mmwebwx-bin/webwxsync?sid={sid}&skey={skey}",
 	"synccheck_api": 		"https://{host}/cgi-bin/mmwebwx-bin/synccheck?r={r}&skey={skey}&sid={sid}&uin={uin}&deviceid={deviceid}&synckey={synckey}",
 	"sendmsg_api": 			"https://{host}/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket={pass_ticket}",
+	// 同意好友申请
+	"verify_user_api": 		"https://{host}/cgi-bin/mmwebwx-bin/webwxverifyuser?r={r}&pass_ticket={pass_ticket}",
+	// 上传文件
+	"upload_media_api": 	"https://{prefix}.{host}/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json",
+	// 发送文件
+	"sendappmsg_api":		"https://{host}/cgi-bin/mmwebwx-bin/webwxsendappmsg?fun=async&f=json",
+	// 发送图片
+	"sendimgmsg_api":		"https://{host}/cgi-bin/mmwebwx-bin/webwxsendmsgimg?fun=async&f=json",
 	// 暂时没用到
 	"statreport_api": 		"https://{host}/cgi-bin/mmwebwx-bin/webwxstatreport?fun=new&lang=zh_CN&pass_ticket={pass_ticket}",
 }

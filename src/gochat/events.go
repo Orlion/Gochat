@@ -10,12 +10,15 @@ type EventType int
 
 const (
 	_ EventType = iota
+	GenUuidEvent		// 生成Uuid
 	ScanCodeEvent		// 已扫码，未确认
 	ConfirmAuthEvent	// 已确认授权登录
 	InitEvent			// 初始化完成
 	ContactsInitEvent	// 联系人初始化完
 	ContactChangeEvent	// 联系人改变了
-	MsgEvent
+	MsgEvent			// 消息
+	FriendReqEvent		// 好友申请
+	LocationEvent		// 位置消息
 )
 
 type Event struct {
@@ -26,6 +29,7 @@ type Event struct {
 type MsgEventData struct{
 	IsGroupMsg       bool
 	IsMediaMsg       bool
+	IsLocationMsg 	 bool
 	IsSendByMySelf   bool
 	MsgType          int64
 	AtMe             bool
@@ -35,10 +39,13 @@ type MsgEventData struct{
 	FromUserInfo     Contact
 	SenderUserName   string
 	SenderUserInfo   SenderUserInfo
-	SenderUserId	 string
+	SenderUserId	 string					// 根据SendUserName生成ID
 	ToUserName       string
 	ToUserInfo       Contact
 	OriginalMsg      map[string]interface{}
+	LocationX		 string					// 位置，eg: 36.093239
+	LocationY 		 string					// 位置，eg：123.376060
+	LocationLabel  	 string					// 位置文本
 }
 
 type ContactChangeType int
@@ -52,6 +59,25 @@ type ContactEventData struct {
 	ChangeType	ContactChangeType
 	UserName	string
 }
+
+// 有好友请求时会填充该结构体
+type FriendReqEventData struct {
+	Alias		string
+	AttrStatus	string
+	City		string
+	Content		string
+	NickName	string
+	OpCode		string
+	Province	string
+	QQNum		string
+	Scene		string
+	Sex			string
+	Signature	string
+	Ticket		string
+	UserName	string
+	VerifyFlag	string
+}
+
 
 type SenderUserInfo struct {
 	UserName	string
@@ -83,6 +109,22 @@ func (this *Wechat) handleSyncResponse(resp *syncMessageResponse) {
 func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 
 	fromUserName := msg["FromUserName"].(string)
+	if "fmessage" == fromUserName { // 加好友消息
+		friendReqEventData, err := msg["RecommendInfo"].(FriendReqEventData)
+		fmt.Println(err)
+		if err {
+			event := Event {
+				Time:	time.Now().Unix(),
+				Data:	friendReqEventData,
+			}
+			handler, found := this.handlers[FriendReqEvent]
+			if found {
+				handler(event)
+			}
+		}
+
+		return
+	}
 	toUserName := msg["ToUserName"].(string)
 	senderUserName := fromUserName
 	content := msg["Content"].(string)
@@ -125,6 +167,9 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 	case 43: {
 		// 视频
 		path = "webwxgetvideo"
+	}
+	case 37: {
+		// 好友请求
 	}
 	}
 	if len(path) > 0 {
@@ -229,6 +274,9 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		ToUserName:		toUserName,
 		ToUserInfo:		toUserInfo,
 		OriginalMsg:	msg,
+		LocationX:		"",
+		LocationY:		"",
+		LocationLabel:  "",
 	}
 
 	event := Event {
@@ -254,4 +302,14 @@ func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, 
 			Data: data,
 		})
 	}
+}
+
+func (this *Wechat) LocationMsgEvent() {
+	/*
+	OriContent
+	<?xml version="1.0"?>
+	<msg>
+		<location x="36.095364" y="120.373940" scale="16" label="市北区鞍山路(青岛鞍山路小学南)" maptype="0" poiname="[位置]" />
+	</msg>
+	*/
 }

@@ -87,8 +87,6 @@ func (this *Wechat) Run() error {
 			return err
 		}
 		this.storage.setData(this.Uuid, this.baseRequest, this.passTicket, this.httpClient.Cookies, this.host)
-	} else {
-		this.storage.delData()
 	}
 	err = this.init()
 	if err != nil {

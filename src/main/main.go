@@ -14,7 +14,7 @@ import (
 
 func main() {
 	wechat := gochat.NewWechat(gochat.Option{
-		StorageDirPath: "D:/develop/",
+		StorageDirPath: "",
 	})
 	wechat.Handle(gochat.MsgEvent, func(event gochat.Event){
 		eventData, ok := event.Data.(gochat.MsgEventData)
@@ -37,6 +37,14 @@ func main() {
 					wechat.SendTextMsg(res, eventData.SenderUserName)
 				}
 			}
+		}
+	})
+
+	wechat.Handle(gochat.FriendReqEvent, func(event gochat.Event){
+		fmt.Println("frient event")
+		eventData, ok := event.Data.(gochat.FriendReqEventData)
+		if ok {
+			wechat.VerifyUser(eventData.UserName, eventData.Ticket)
 		}
 	})
 	err := wechat.Run()
@@ -66,7 +74,7 @@ func tuling(input string, city string, userId string) (string, error) {
 		},
 	}
 
-	data := `{"perception": {"inputText": {"text": "`+ input +`"},"selfInfo": {"location": {"city": "`+ city +`"},}},"userInfo": {"apiKey": "f494d51dbf4aa35312da97a577949a53","userId": `+ userId +`}}`
+	data := `{"perception": {"inputText": {"text": "`+ input +`"},"selfInfo": {"location": {"city": "`+ city +`"},}},"userInfo": {"apiKey": "x","userId": `+ userId +`}}`
 	req, err := http.NewRequest("POST", api, bytes.NewReader([]byte(data)))
 	if err != nil {
 		return ``, err
