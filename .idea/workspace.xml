@@ -18,9 +18,11 @@
       <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="5" column="14" lean-forward="true" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
-              <folding />
+            <state relative-caret-position="285">
+              <caret line="78" column="141" lean-forward="false" selection-start-line="78" selection-start-column="141" selection-end-line="78" selection-end-column="141" />
+              <folding>
+                <element signature="e#14#123#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -28,20 +30,123 @@
       <file leaf-file-name="wechat.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/gochat/wechat.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="135" column="45" lean-forward="true" selection-start-line="135" selection-start-column="45" selection-end-line="135" selection-end-column="45" />
+            <state relative-caret-position="314">
+              <caret line="70" column="23" lean-forward="true" selection-start-line="70" selection-start-column="23" selection-end-line="70" selection-end-column="23" />
               <folding>
-                <element signature="e#16#129#0" expanded="true" />
+                <element signature="e#16#114#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/config.go">
+      <file leaf-file-name="contacts.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/contacts.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="22" column="12" lean-forward="true" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
+            <state relative-caret-position="247">
+              <caret line="58" column="19" lean-forward="false" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
+              <folding>
+                <element signature="e#132#215#0" expanded="false" />
+                <element signature="e#237#1003#0" expanded="false" />
+                <element signature="e#1025#1255#0" expanded="false" />
+                <element signature="e#1281#1362#0" expanded="false" />
+                <element signature="e#1393#1453#0" expanded="false" />
+                <element signature="n#!!block;n#initContact#0" expanded="false" />
+                <element signature="e#1609#1776#0" expanded="false" />
+                <element signature="e#1626#1642#0" expanded="false" />
+                <element signature="e#1708#1727#0" expanded="false" />
+                <element signature="e#1831#2124#0" expanded="false" />
+                <element signature="e#1913#1939#0" expanded="false" />
+                <element signature="e#1982#2058#0" expanded="false" />
+                <element signature="e#2064#2088#0" expanded="false" />
+                <element signature="e#2207#2391#0" expanded="false" />
+                <element signature="e#2293#2345#0" expanded="false" />
+                <element signature="n#!!block;n#getContacts#0" expanded="false" />
+                <element signature="e#3053#3138#0" expanded="false" />
+                <element signature="e#3231#3265#0" expanded="false" />
+                <element signature="n#!!block;n#fetchContacts#0" expanded="false" />
+                <element signature="e#3466#3557#0" expanded="false" />
+                <element signature="e#3507#3553#0" expanded="false" />
+                <element signature="e#3608#3691#0" expanded="false" />
+                <element signature="e#3709#3731#0" expanded="false" />
+                <element signature="e#4016#4101#0" expanded="false" />
+                <element signature="e#4199#4221#0" expanded="false" />
+                <element signature="n#!!block;n#updateContact#0" expanded="false" />
+                <element signature="e#4428#4478#0" expanded="false" />
+                <element signature="e#4514#4889#0" expanded="false" />
+                <element signature="e#4603#4655#0" expanded="false" />
+                <element signature="e#4690#4722#0" expanded="false" />
+                <element signature="e#4773#4802#0" expanded="false" />
+                <element signature="e#4808#4838#0" expanded="false" />
+                <element signature="n#!!block;n#contactsModify#0" expanded="false" />
+                <element signature="e#5067#5193#0" expanded="false" />
+                <element signature="n#!!block;n#contactsDelete#0" expanded="false" />
+                <element signature="e#5443#5557#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="login.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/login.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="808">
+              <caret line="50" column="53" lean-forward="true" selection-start-line="50" selection-start-column="53" selection-end-line="50" selection-end-column="53" />
+              <folding>
+                <element signature="e#16#112#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="storage.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/storage.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="820">
+              <caret line="65" column="29" lean-forward="false" selection-start-line="65" selection-start-column="29" selection-end-line="65" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="model.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/model.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="95">
+              <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="messge.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/messge.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="472">
+              <caret line="90" column="88" lean-forward="false" selection-start-line="90" selection-start-column="82" selection-end-line="90" selection-end-column="88" />
+              <folding>
+                <element signature="e#16#128#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="listen.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/listen.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="352">
+              <caret line="135" column="75" lean-forward="true" selection-start-line="135" selection-start-column="75" selection-end-line="135" selection-end-column="75" />
+              <folding>
+                <element signature="e#16#105#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wechatApi.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/gochat/wechatApi.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="12" column="18" lean-forward="false" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -50,68 +155,35 @@
       <file leaf-file-name="events.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/gochat/events.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="5" column="10" lean-forward="true" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="contacts.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/contacts.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3477">
-              <caret line="189" column="48" lean-forward="false" selection-start-line="189" selection-start-column="48" selection-end-line="189" selection-end-column="48" />
-              <folding>
-                <element signature="e#16#83#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="utils.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/utils.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="817">
-              <caret line="48" column="22" lean-forward="false" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
+            <state relative-caret-position="85">
+              <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
               <folding>
                 <element signature="e#16#68#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sync.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/sync.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="626">
-              <caret line="105" column="38" lean-forward="false" selection-start-line="105" selection-start-column="38" selection-end-line="105" selection-end-column="38" />
-              <folding>
-                <element signature="e#16#107#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="httpClient.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/httpClient.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="221" column="22" lean-forward="true" selection-start-line="221" selection-start-column="22" selection-end-line="221" selection-end-column="22" />
-              <folding>
-                <element signature="e#16#124#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="messge.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/gochat/messge.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="802">
-              <caret line="256" column="1" lean-forward="false" selection-start-line="256" selection-start-column="1" selection-end-line="256" selection-end-column="1" />
-              <folding>
-                <element signature="e#16#112#0" expanded="true" />
+                <element signature="e#434#500#0" expanded="false" />
+                <element signature="e#598#628#0" expanded="false" />
+                <element signature="e#666#697#0" expanded="false" />
+                <element signature="e#729#757#0" expanded="false" />
+                <element signature="e#789#812#0" expanded="false" />
+                <element signature="e#855#885#0" expanded="false" />
+                <element signature="e#1096#1127#0" expanded="false" />
+                <element signature="e#1659#1791#0" expanded="false" />
+                <element signature="e#1822#1866#0" expanded="false" />
+                <element signature="n#!!block;n#SetListener#0" expanded="false" />
+                <element signature="e#2494#2556#0" expanded="false" />
+                <element signature="n#!!block;n#triggerGenUuidEvent#0" expanded="false" />
+                <element signature="e#2854#2991#0" expanded="false" />
+                <element signature="e#2872#2987#0" expanded="false" />
+                <element signature="e#3438#3599#0" expanded="false" />
+                <element signature="e#3456#3595#0" expanded="false" />
+                <element signature="e#3731#3874#0" expanded="false" />
+                <element signature="e#3749#3870#0" expanded="false" />
+                <element signature="e#4000#4129#0" expanded="false" />
+                <element signature="e#4018#4125#0" expanded="false" />
+                <element signature="n#!!block;n#triggerContactsInitEvent#0" expanded="false" />
+                <element signature="e#4952#5112#0" expanded="false" />
+                <element signature="e#4970#5108#0" expanded="false" />
+                <element signature="e#5266#5426#0" expanded="false" />
+                <element signature="e#5284#5422#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -128,26 +200,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>SyncKey</find>
-      <find>Skey</find>
-      <find>wx_init_api</find>
-      <find>Contact</find>
-      <find>getcontact_api</find>
-      <find>Uuid</find>
-      <find>Utils</find>
-      <find>skeyKV</find>
-      <find>FromUserName</find>
-      <find>utils</find>
-      <find>c</find>
-      <find>handleSyncResponse</find>
-      <find>isSendByMySelf</find>
-      <find>ChatRoomId</find>
-      <find>Statues</find>
-      <find>Signature</find>
-      <find>Member</find>
-      <find>contact</find>
-      <find>fmt</find>
-      <find>setD</find>
       <find>fmt.</find>
       <find>this.baseRequest.S</find>
       <find>Cookie</find>
@@ -158,6 +210,26 @@
       <find>webwxsendmsg</find>
       <find>Ver</find>
       <find>RecommendInfo</find>
+      <find>Config</find>
+      <find>rand</find>
+      <find>initResp</find>
+      <find>type</find>
+      <find>GroupMember</find>
+      <find>Wechat</find>
+      <find>logger.Println</find>
+      <find>updateContact</find>
+      <find>this</find>
+      <find>triggerMessageEvent</find>
+      <find>msgType</find>
+      <find>reg</find>
+      <find>contact</find>
+      <find>syncCheckApi</find>
+      <find>regexp</find>
+      <find>`</find>
+      <find>Modify</find>
+      <find>verifyUserApi</find>
+      <find>recommendInfo</find>
+      <find>fmt.P</find>
     </findStrings>
     <replaceStrings>
       <replace>this</replace>
@@ -166,9 +238,15 @@
       <replace>*utils</replace>
       <replace>utils</replace>
       <replace>Utils</replace>
+      <replace>weChatApi</replace>
+      <replace>httpClient</replace>
+      <replace>weChat</replace>
+      <replace>WeChat</replace>
+      <replace>&quot;</replace>
     </replaceStrings>
     <dirStrings>
       <dir>D:\develop\workplace\go\gochat\src\wechatBot</dir>
+      <dir>D:\develop\workplace\go\gochat\src</dir>
       <dir>D:\develop\workplace\go\gochat</dir>
       <dir>D:\develop\workplace\go\gochat\src\gochat</dir>
     </dirStrings>
@@ -199,14 +277,37 @@
         <option value="$PROJECT_DIR$/src/gochat/cache.go" />
         <option value="$PROJECT_DIR$/src/gochat/event.go" />
         <option value="$PROJECT_DIR$/src/gochat/utils.go" />
-        <option value="$PROJECT_DIR$/src/gochat/contacts.go" />
-        <option value="$PROJECT_DIR$/src/gochat/sync.go" />
-        <option value="$PROJECT_DIR$/src/gochat/storage.go" />
-        <option value="$PROJECT_DIR$/src/gochat/wechat.go" />
-        <option value="$PROJECT_DIR$/src/gochat/httpClient.go" />
+        <option value="$PROJECT_DIR$/src/gochat/core/aa.go" />
+        <option value="$PROJECT_DIR$/src/gochat/sync/sync.go" />
+        <option value="$PROJECT_DIR$/src/gochat/core/model.go" />
+        <option value="$PROJECT_DIR$/src/gochat/contact/contacts.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/Contact.go" />
+        <option value="$PROJECT_DIR$/src/gochat/nessage/messge.go" />
+        <option value="$PROJECT_DIR$/src/gochat/event/events.go" />
+        <option value="$PROJECT_DIR$/src/gochat/core/config.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/net.go" />
+        <option value="$PROJECT_DIR$/src/gochat/storage/storage.go" />
+        <option value="$PROJECT_DIR$/src/gochat/core/wechat.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/storage.go" />
+        <option value="$PROJECT_DIR$/src/gochat/init.go" />
         <option value="$PROJECT_DIR$/src/gochat/config.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/wechat.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/contact.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/event.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model/message.go" />
+        <option value="$PROJECT_DIR$/src/gochat/sync.go" />
+        <option value="$PROJECT_DIR$/src/gochat/model.go" />
+        <option value="$PROJECT_DIR$/src/gochat/httpClient.go" />
+        <option value="$PROJECT_DIR$/src/gochat/utils/utils.go" />
+        <option value="$PROJECT_DIR$/src/main/listener.go" />
+        <option value="$PROJECT_DIR$/src/gochat/storage.go" />
+        <option value="$PROJECT_DIR$/src/gochat/wechatApi.go" />
         <option value="$PROJECT_DIR$/src/gochat/messge.go" />
+        <option value="$PROJECT_DIR$/src/gochat/contacts.go" />
         <option value="$PROJECT_DIR$/src/gochat/events.go" />
+        <option value="$PROJECT_DIR$/src/gochat/wechat.go" />
+        <option value="$PROJECT_DIR$/src/gochat/login.go" />
+        <option value="$PROJECT_DIR$/src/gochat/listen.go" />
         <option value="$PROJECT_DIR$/src/main/main.go" />
       </list>
     </option>
@@ -215,7 +316,7 @@
     <option name="x" value="54" />
     <option name="y" value="-8" />
     <option name="width" value="1874" />
-    <option name="height" value="1092" />
+    <option name="height" value="1096" />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="1" />
@@ -236,6 +337,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -287,11 +389,19 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\develop\workplace\go\gochat\src\gochat\utils" />
+      <recent name="D:\develop\workplace\go\gochat\src\gochat" />
+      <recent name="D:\develop\workplace\go\gochat\src\gochat\nessage" />
+      <recent name="D:\develop\workplace\go\gochat\src\gochat\sync" />
+      <recent name="D:\develop\workplace\go\gochat\src\gochat\storage" />
+    </key>
   </component>
   <component name="RunManager" selected="Go Single File.go run main.go">
     <configuration default="false" name="go run main.go" type="GoRunFileConfiguration" factoryName="Go Single File" temporary="true">
@@ -501,29 +611,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="54" y="-8" width="1874" height="1092" extended-state="0" />
-    <editor active="false" />
+    <frame x="54" y="-8" width="1874" height="1096" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18302095" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32846716" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3281412" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32846716" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28764278" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32846716" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1940463" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3281412" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32846716" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2877998" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Dynamic Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -552,129 +662,15 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <option name="time" value="19" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="17" lean-forward="false" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/wechat.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#16#129#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/net/url/url.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14706">
-          <caret line="774" column="5" lean-forward="false" selection-start-line="774" selection-start-column="5" selection-end-line="774" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/utils.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="27" column="19" lean-forward="false" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="19" />
-          <folding>
-            <element signature="e#16#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/wechatBot.go" />
-    <entry file="file://$PROJECT_DIR$/src/gochat/httpClient.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" column="5" lean-forward="false" selection-start-line="17" selection-start-column="5" selection-end-line="17" selection-end-column="5" />
-          <folding>
-            <element signature="e#16#124#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/config.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="7" column="69" lean-forward="false" selection-start-line="7" selection-start-column="69" selection-end-line="7" selection-end-column="69" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="45" column="24" lean-forward="true" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/wechat1/wechat1.go" />
-    <entry file="file://$PROJECT_DIR$/src/utils/utils.go" />
-    <entry file="file://$PROJECT_DIR$/src/config/wechat.go" />
-    <entry file="file://$PROJECT_DIR$/src/utils/utils.go" />
-    <entry file="file://$PROJECT_DIR$/src/main/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/utils.go" />
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/regexp/regexp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="759" column="18" lean-forward="false" selection-start-line="759" selection-start-column="18" selection-end-line="759" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/time/time.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="459" column="21" lean-forward="true" selection-start-line="459" selection-start-column="21" selection-end-line="459" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/net/http/cookie.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/net/http/response.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="111" column="35" lean-forward="false" selection-start-line="111" selection-start-column="35" selection-end-line="111" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/net/http/client.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="75" column="17" lean-forward="false" selection-start-line="75" selection-start-column="4" selection-end-line="75" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../Go/src/net/net.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="152" column="4" lean-forward="false" selection-start-line="152" selection-start-column="4" selection-end-line="152" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -736,7 +732,34 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
           <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#16#68#0" expanded="true" />
+            <element signature="e#434#500#0" expanded="false" />
+            <element signature="e#598#628#0" expanded="false" />
+            <element signature="e#666#697#0" expanded="false" />
+            <element signature="e#729#757#0" expanded="false" />
+            <element signature="e#789#812#0" expanded="false" />
+            <element signature="e#855#885#0" expanded="false" />
+            <element signature="e#1096#1127#0" expanded="false" />
+            <element signature="e#1659#1791#0" expanded="false" />
+            <element signature="e#1822#1866#0" expanded="false" />
+            <element signature="n#!!block;n#SetListener#0" expanded="false" />
+            <element signature="e#2494#2556#0" expanded="false" />
+            <element signature="n#!!block;n#triggerGenUuidEvent#0" expanded="false" />
+            <element signature="e#2854#2991#0" expanded="false" />
+            <element signature="e#2872#2987#0" expanded="false" />
+            <element signature="e#3438#3599#0" expanded="false" />
+            <element signature="e#3456#3595#0" expanded="false" />
+            <element signature="e#3731#3874#0" expanded="false" />
+            <element signature="e#3749#3870#0" expanded="false" />
+            <element signature="e#4000#4129#0" expanded="false" />
+            <element signature="e#4018#4125#0" expanded="false" />
+            <element signature="n#!!block;n#triggerContactsInitEvent#0" expanded="false" />
+            <element signature="e#4952#5112#0" expanded="false" />
+            <element signature="e#4970#5108#0" expanded="false" />
+            <element signature="e#5266#5426#0" expanded="false" />
+            <element signature="e#5284#5422#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -763,45 +786,63 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5301">
           <caret line="282" column="5" lean-forward="false" selection-start-line="282" selection-start-column="5" selection-end-line="282" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/wechatApi.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/core/aa.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/core/model.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/wechat.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#114#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../Go/src/io/io.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="310">
+          <caret line="76" column="5" lean-forward="false" selection-start-line="76" selection-start-column="5" selection-end-line="76" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../Go/src/builtin/builtin.go">
+    <entry file="file://$PROJECT_DIR$/../../../Go/src/log/log.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="100" column="4" lean-forward="false" selection-start-line="100" selection-start-column="4" selection-end-line="100" selection-end-column="4" />
+        <state relative-caret-position="310">
+          <caret line="61" column="5" lean-forward="false" selection-start-line="61" selection-start-column="5" selection-end-line="61" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/utils.go">
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/contact.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/event.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/message.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/net.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/storage.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/model/wechat.go" />
+    <entry file="file://$PROJECT_DIR$/src/gochat/init.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="817">
-          <caret line="48" column="22" lean-forward="false" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
-          <folding>
-            <element signature="e#16#68#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="38">
+          <caret line="2" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/contacts.go">
+    <entry file="file://$PROJECT_DIR$/../../../Go/src/bytes/reader.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3477">
-          <caret line="189" column="48" lean-forward="false" selection-start-line="189" selection-start-column="48" selection-end-line="189" selection-end-column="48" />
-          <folding>
-            <element signature="e#16#83#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="797">
+          <caret line="149" column="5" lean-forward="false" selection-start-line="149" selection-start-column="5" selection-end-line="149" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/storage.go">
+    <entry file="file://$PROJECT_DIR$/xxx_debug.log" />
+    <entry file="file://$PROJECT_DIR$/../../../Go/src/fmt/print.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="778">
-          <caret line="60" column="30" lean-forward="true" selection-start-line="60" selection-start-column="30" selection-end-line="60" selection-end-column="30" />
-          <folding>
-            <element signature="e#16#74#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="310">
+          <caret line="193" column="5" lean-forward="false" selection-start-line="193" selection-start-column="5" selection-end-line="193" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -813,67 +854,183 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/utils/utils.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="333">
+          <caret line="101" column="45" lean-forward="true" selection-start-line="101" selection-start-column="45" selection-end-line="101" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/gochat/httpClient.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="221" column="22" lean-forward="true" selection-start-line="221" selection-start-column="22" selection-end-line="221" selection-end-column="22" />
+        <state relative-caret-position="1026">
+          <caret line="64" column="30" lean-forward="false" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
           <folding>
             <element signature="e#16#124#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/config.go">
+    <entry file="file://$PROJECT_DIR$/src/main/listener.go" />
+    <entry file="file://$PROJECT_DIR$/../../../Go/src/builtin/builtin.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="12" lean-forward="true" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
+        <state relative-caret-position="4826">
+          <caret line="254" column="4" lean-forward="false" selection-start-line="254" selection-start-column="4" selection-end-line="254" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/storage.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="820">
+          <caret line="65" column="29" lean-forward="false" selection-start-line="65" selection-start-column="29" selection-end-line="65" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/wechatApi.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="18" lean-forward="false" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/model.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/gochat/messge.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="802">
-          <caret line="256" column="1" lean-forward="false" selection-start-line="256" selection-start-column="1" selection-end-line="256" selection-end-column="1" />
+        <state relative-caret-position="472">
+          <caret line="90" column="88" lean-forward="false" selection-start-line="90" selection-start-column="82" selection-end-line="90" selection-end-column="88" />
           <folding>
-            <element signature="e#16#112#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/sync.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="626">
-          <caret line="105" column="38" lean-forward="false" selection-start-line="105" selection-start-column="38" selection-end-line="105" selection-end-column="38" />
-          <folding>
-            <element signature="e#16#107#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gochat/wechat.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="135" column="45" lean-forward="true" selection-start-line="135" selection-start-column="45" selection-end-line="135" selection-end-column="45" />
-          <folding>
-            <element signature="e#16#129#0" expanded="true" />
+            <element signature="e#16#128#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/gochat/events.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="10" lean-forward="true" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
-          <folding />
+        <state relative-caret-position="85">
+          <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#68#0" expanded="true" />
+            <element signature="e#434#500#0" expanded="false" />
+            <element signature="e#598#628#0" expanded="false" />
+            <element signature="e#666#697#0" expanded="false" />
+            <element signature="e#729#757#0" expanded="false" />
+            <element signature="e#789#812#0" expanded="false" />
+            <element signature="e#855#885#0" expanded="false" />
+            <element signature="e#1096#1127#0" expanded="false" />
+            <element signature="e#1659#1791#0" expanded="false" />
+            <element signature="e#1822#1866#0" expanded="false" />
+            <element signature="n#!!block;n#SetListener#0" expanded="false" />
+            <element signature="e#2494#2556#0" expanded="false" />
+            <element signature="n#!!block;n#triggerGenUuidEvent#0" expanded="false" />
+            <element signature="e#2854#2991#0" expanded="false" />
+            <element signature="e#2872#2987#0" expanded="false" />
+            <element signature="e#3438#3599#0" expanded="false" />
+            <element signature="e#3456#3595#0" expanded="false" />
+            <element signature="e#3731#3874#0" expanded="false" />
+            <element signature="e#3749#3870#0" expanded="false" />
+            <element signature="e#4000#4129#0" expanded="false" />
+            <element signature="e#4018#4125#0" expanded="false" />
+            <element signature="n#!!block;n#triggerContactsInitEvent#0" expanded="false" />
+            <element signature="e#4952#5112#0" expanded="false" />
+            <element signature="e#4970#5108#0" expanded="false" />
+            <element signature="e#5266#5426#0" expanded="false" />
+            <element signature="e#5284#5422#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/contacts.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="58" column="19" lean-forward="false" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
+          <folding>
+            <element signature="e#132#215#0" expanded="false" />
+            <element signature="e#237#1003#0" expanded="false" />
+            <element signature="e#1025#1255#0" expanded="false" />
+            <element signature="e#1281#1362#0" expanded="false" />
+            <element signature="e#1393#1453#0" expanded="false" />
+            <element signature="n#!!block;n#initContact#0" expanded="false" />
+            <element signature="e#1609#1776#0" expanded="false" />
+            <element signature="e#1626#1642#0" expanded="false" />
+            <element signature="e#1708#1727#0" expanded="false" />
+            <element signature="e#1831#2124#0" expanded="false" />
+            <element signature="e#1913#1939#0" expanded="false" />
+            <element signature="e#1982#2058#0" expanded="false" />
+            <element signature="e#2064#2088#0" expanded="false" />
+            <element signature="e#2207#2391#0" expanded="false" />
+            <element signature="e#2293#2345#0" expanded="false" />
+            <element signature="n#!!block;n#getContacts#0" expanded="false" />
+            <element signature="e#3053#3138#0" expanded="false" />
+            <element signature="e#3231#3265#0" expanded="false" />
+            <element signature="n#!!block;n#fetchContacts#0" expanded="false" />
+            <element signature="e#3466#3557#0" expanded="false" />
+            <element signature="e#3507#3553#0" expanded="false" />
+            <element signature="e#3608#3691#0" expanded="false" />
+            <element signature="e#3709#3731#0" expanded="false" />
+            <element signature="e#4016#4101#0" expanded="false" />
+            <element signature="e#4199#4221#0" expanded="false" />
+            <element signature="n#!!block;n#updateContact#0" expanded="false" />
+            <element signature="e#4428#4478#0" expanded="false" />
+            <element signature="e#4514#4889#0" expanded="false" />
+            <element signature="e#4603#4655#0" expanded="false" />
+            <element signature="e#4690#4722#0" expanded="false" />
+            <element signature="e#4773#4802#0" expanded="false" />
+            <element signature="e#4808#4838#0" expanded="false" />
+            <element signature="n#!!block;n#contactsModify#0" expanded="false" />
+            <element signature="e#5067#5193#0" expanded="false" />
+            <element signature="n#!!block;n#contactsDelete#0" expanded="false" />
+            <element signature="e#5443#5557#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/wechat.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="314">
+          <caret line="70" column="23" lean-forward="true" selection-start-line="70" selection-start-column="23" selection-end-line="70" selection-end-column="23" />
+          <folding>
+            <element signature="e#16#114#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/login.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="808">
+          <caret line="50" column="53" lean-forward="true" selection-start-line="50" selection-start-column="53" selection-end-line="50" selection-end-column="53" />
+          <folding>
+            <element signature="e#16#112#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gochat/listen.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="135" column="75" lean-forward="true" selection-start-line="135" selection-start-column="75" selection-end-line="135" selection-end-column="75" />
+          <folding>
+            <element signature="e#16#105#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="5" column="14" lean-forward="true" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
-          <folding />
+        <state relative-caret-position="285">
+          <caret line="78" column="141" lean-forward="false" selection-start-line="78" selection-start-column="141" selection-end-line="78" selection-end-column="141" />
+          <folding>
+            <element signature="e#14#123#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

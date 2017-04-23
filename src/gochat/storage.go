@@ -5,21 +5,22 @@ import (
 	"encoding/json"
 	"os"
 	"io/ioutil"
+	"errors"
 )
 
-type Storage struct {
-	storageDirPath string
+type storage struct {
+	filePath string
 }
 
 type storageData struct {
-	Uuid 		string
-	BaseRequest BaseRequest
-	PassTicket 	string
-	Cookies 	[]*http.Cookie
-	Host 		string
+	Uuid			string
+	BaseRequest 	baseRequest
+	PassTicket 		string
+	Cookies			[]*http.Cookie
+	Host			string
 }
 
-func (this *Storage) setData(Uuid string, baseRequest BaseRequest, passTicket string, cookies []*http.Cookie, host string) error {
+func (storage *storage) setData(Uuid string, baseRequest baseRequest, passTicket string, cookies []*http.Cookie, host string) error {
 	storageStr, _ := json.Marshal(storageData {
 		Uuid:			Uuid,
 		BaseRequest: 	baseRequest,
@@ -28,7 +29,7 @@ func (this *Storage) setData(Uuid string, baseRequest BaseRequest, passTicket st
 		Host:			host,
 	})
 
-	fileName := this.storageDirPath + "storage_data.json"
+	fileName := storage.filePath
 	file, err := os.OpenFile(fileName, os.O_CREATE, 0666)
 	if err != nil {
 		return err
@@ -41,23 +42,28 @@ func (this *Storage) setData(Uuid string, baseRequest BaseRequest, passTicket st
 	return err
 }
 
-func (this *Storage) getData() (string, BaseRequest, string, []*http.Cookie, string, error) {
-	fileName := this.storageDirPath + "storage_data.json"
-	bs, err := ioutil.ReadFile(fileName)
+func (storage *storage) getData() (string, baseRequest, string, []*http.Cookie, string, error) {
+
+	bs, err := ioutil.ReadFile(storage.filePath)
 	if err != nil {
-		return "", BaseRequest{}, "", nil, "", err
+		return "", baseRequest{}, "", nil, "", err
 	}
+
 	var storageData storageData
 	err = json.Unmarshal(bs, &storageData)
 	if err != nil {
-		return "", BaseRequest{}, "", nil, "", err
+		return "", baseRequest{}, "", nil, "", err
+	}
+
+	if "" == storageData.Uuid || "" == storageData.PassTicket || "" == storageData.Host {
+		return storageData.Uuid, storageData.BaseRequest, storageData.PassTicket, storageData.Cookies, storageData.Host, errors.New("Storage Is Nil")
 	}
 
 	return storageData.Uuid, storageData.BaseRequest, storageData.PassTicket, storageData.Cookies, storageData.Host, nil
 }
 
-func (this *Storage) delData() error {
-	fileName := this.storageDirPath + "storage_data.json"
+func (this *storage) delData() error {
+	fileName := this.filePath
 	err := os.Remove(fileName)
 	return err
 }

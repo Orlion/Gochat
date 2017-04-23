@@ -4,8 +4,10 @@ import (
 	"strings"
 	"fmt"
 	"time"
+	"gochat/utils"
 )
 
+// 事件类型
 type EventType int
 
 const (
@@ -13,177 +15,357 @@ const (
 	GenUuidEvent		// 生成Uuid
 	ScanCodeEvent		// 已扫码，未确认
 	ConfirmAuthEvent	// 已确认授权登录
+	LoginEvent 			// 已登录
 	InitEvent			// 初始化完成
 	ContactsInitEvent	// 联系人初始化完
+	ListenFailedEvent 	// 同步微信失败,可能为客户端已退出 | 被微信反爬虫
 	ContactChangeEvent	// 联系人改变了
-	MsgEvent			// 消息
-	FriendReqEvent		// 好友申请
-	LocationEvent		// 位置消息
+	ContactDeleteEvent  // 联系人删除事件
+	MessageEvent		// 消息
 )
 
+// 事件体
 type Event struct {
-	Time int64
-	Data interface{}
+	Time 		int64
+	EventType 	EventType
+	Data 		interface{}
 }
 
-type MsgEventData struct{
-	IsGroupMsg       bool
-	IsMediaMsg       bool
-	IsLocationMsg 	 bool
-	IsSendByMySelf   bool
-	MsgType          int64
-	AtMe             bool
-	MediaUrl         string
-	Content          string
-	FromUserName     string
-	FromUserInfo     Contact
-	SenderUserName   string
-	SenderUserInfo   SenderUserInfo
-	SenderUserId	 string					// 根据SendUserName生成ID
-	ToUserName       string
-	ToUserInfo       Contact
-	OriginalMsg      map[string]interface{}
-	LocationX		 string					// 位置，eg: 36.093239
-	LocationY 		 string					// 位置，eg：123.376060
-	LocationLabel  	 string					// 位置文本
+// 生成Uuid事件的数据
+type GenUuidEventData struct {
+	Uuid 	string
 }
 
-type ContactChangeType int
+// 扫码事件数据
+type ScanCodeEventData struct {
+	UserAvatar 	string
+}
+
+// 授权事件数据
+type ConfirmAuthEventData struct {
+	RedirectUrl 	string
+}
+
+// 登录事件数据
+type LoginEventData struct {
+	DeviceID 	string
+}
+
+// 初始化事件数据
+type InitEventData struct {
+	Me 	Contact
+}
+
+// 通讯录初始化事件数据
+type ContactsInitEventData struct {
+	ContactsCount 	int
+}
+
+// 同步微信失败事件数据
+type ListenFailedEventData struct {
+	ListenFailedCount 	int
+	Host 				string
+}
+
+// 联系人修改事件数据
+type ContactChangeEventData struct {
+	UserNames 	[]string
+}
+
+// 联系人删除事件数据
+type ContactDeleteEventData struct {
+	UserNames 	[]string
+}
+
+// 消息事件数据
+type MessageEventData struct{
+	MessageType       	MessageType
+	IsGroupMessage      bool
+	IsSendByMySelf   	bool
+	IsAtMe             	bool
+	MediaUrl         	string
+	Content          	string
+	FromUserName     	string
+	FromUserInfo     	Contact
+	SenderUserInfo   	SenderUserInfo
+	SenderUserId	 	string					// 根据SendUserName生成ID
+	ToUserName       	string
+	ToUserInfo       	Contact
+	RecommendInfo		map[string]interface{}
+	LocationInfo		LocationInfo
+	OriginalMsg      	map[string]interface{}
+}
+
+// 消息类型
+type MessageType int
 const (
-	_ ContactChangeType = iota
-	ContactModify
-	ContactDelete
+	_ MessageType = iota
+	TextMessage
+	ImgMessage
+	VoiceMessage
+	VideoMessage
+	CardMessage
+	LocationMessage
+	FriendReqMessage
 )
 
-type ContactEventData struct {
-	ChangeType	ContactChangeType
-	UserName	string
-}
-
-// 有好友请求时会填充该结构体
-type FriendReqEventData struct {
-	Alias		string
-	AttrStatus	string
-	City		string
-	Content		string
-	NickName	string
-	OpCode		string
-	Province	string
-	QQNum		string
-	Scene		string
-	Sex			string
-	Signature	string
-	Ticket		string
-	UserName	string
-	VerifyFlag	string
-}
-
-
+// 发送人信息
 type SenderUserInfo struct {
 	UserName	string
 	NickName	string
-	ContactType ContactType	// 发送人类型(好友，群成员，好友兼群成员)
 }
 
-func (this *Wechat) handleSyncResponse(resp *syncMessageResponse) {
+// 位置信息数据
+type LocationInfo struct {
+	X 		string
+	Y 		string
+	Label 	string
+	Img 	string
+}
+
+// 设置事件监听器
+func (weChat *WeChat) SetListener(eventType EventType, listener func(Event)) {
+	weChat.listeners[eventType] = listener
+}
+
+// 处理从微信服务器拉过来的响应数据
+func (weChat *WeChat) handleSyncResponse(resp *syncMessageResponse) {
 
 	if resp.ModContactCount > 0 {
+		userNames := []string{}
 		for _, v := range resp.ModContactList {
-			go this.emitContactChangeEvent(ContactModify, v["UserName"].(string))
+			userNames = append(userNames, v["UserName"].(string))
 		}
+		go weChat.triggerContactChangeEvent(userNames)
 	}
 
 	if resp.DelContactCount > 0 {
-		for _, v := range resp.DelContactList {
-			go this.emitContactChangeEvent(ContactDelete, v["UserName"].(string))
+		userNames := []string{}
+		for _, v := range resp.ModContactList {
+			userNames = append(userNames, v["UserName"].(string))
 		}
+		go weChat.triggerContactDeleteEvent(userNames)
 	}
 
 	if resp.AddMsgCount > 0 {
 		for _, v := range resp.AddMsgList {
-			go this.emitNewMessageEvent(v)
+			go weChat.triggerMessageEvent(v)
 		}
 	}
 }
 
-func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
-
-	fromUserName := msg["FromUserName"].(string)
-	if "fmessage" == fromUserName { // 加好友消息
-		friendReqEventData, err := msg["RecommendInfo"].(FriendReqEventData)
-		fmt.Println(err)
-		if err {
-			event := Event {
-				Time:	time.Now().Unix(),
-				Data:	friendReqEventData,
-			}
-			handler, found := this.handlers[FriendReqEvent]
-			if found {
-				handler(event)
-			}
-		}
-
-		return
+// 触发生成uuid的事件
+func (weChat *WeChat) triggerGenUuidEvent(uuid string) {
+	listener, isReg := weChat.listeners[GenUuidEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType:	GenUuidEvent,
+			Data: 		GenUuidEventData {
+				Uuid:	uuid,
+			},
+		})
 	}
-	toUserName := msg["ToUserName"].(string)
-	senderUserName := fromUserName
-	content := msg["Content"].(string)
+}
+
+// 触发扫码事件(未确认)
+func (weChat *WeChat) triggerScanCodeEvent(userAvatar string) {
+	listener, isReg := weChat.listeners[ScanCodeEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ScanCodeEvent,
+			Data: 		ScanCodeEventData {
+				UserAvatar:		userAvatar,
+			},
+		})
+	}
+}
+
+// 触发授权登录事件
+func (weChat *WeChat) triggerConfirmAuthEvent(redirectUrl string) {
+	listener, isReg := weChat.listeners[ConfirmAuthEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ConfirmAuthEvent,
+			Data: 		ConfirmAuthEventData {
+				RedirectUrl:		redirectUrl,
+			},
+		})
+	}
+}
+
+// 触发登录事件
+func (weChat *WeChat) triggerLoginEvent(deviceID string) {
+	listener, isReg := weChat.listeners[LoginEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	LoginEvent,
+			Data: 		LoginEventData {
+				DeviceID:		deviceID,
+			},
+		})
+	}
+}
+
+// 触发初始化事件
+func (weChat *WeChat) triggerInitEvent(me Contact) {
+	listener, isReg := weChat.listeners[InitEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	InitEvent,
+			Data: 		InitEventData {
+				Me:		me,
+			},
+		})
+	}
+}
+
+// 触发通讯录初始化事件
+func (weChat *WeChat) triggerContactsInitEvent(contactsCount int) {
+	listener, isReg := weChat.listeners[ContactsInitEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ContactsInitEvent,
+			Data: 		ContactsInitEventData {
+				ContactsCount:		contactsCount,
+			},
+		})
+	}
+}
+
+func (weChat *WeChat) triggerListenFailedEvent(listenFailedCount int, host string) {
+	listener, isReg := weChat.listeners[ListenFailedEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ListenFailedEvent,
+			Data: 		ListenFailedEventData {
+				ListenFailedCount:		listenFailedCount,
+				Host:					host,
+			},
+		})
+	}
+}
+
+// 触发通讯录修改事件
+func (weChat *WeChat) triggerContactChangeEvent(userNames []string) {
+	listener, isReg := weChat.listeners[ContactChangeEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ContactChangeEvent,
+			Data: 		ContactChangeEventData {
+				UserNames:	userNames,
+			},
+		})
+	}
+}
+
+// 触发通讯录删除事件
+func (weChat *WeChat) triggerContactDeleteEvent(userNames []string) {
+	listener, isReg := weChat.listeners[ContactDeleteEvent]
+	if isReg {
+		listener(Event{
+			Time: 		time.Now().Unix(),
+			EventType: 	ContactDeleteEvent,
+			Data: 		ContactDeleteEventData {
+				UserNames:	userNames,
+			},
+		})
+	}
+}
+
+// 触发消息事件
+func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
+
+	messageType := TextMessage
+	isGroupMessage := false
 	isSendByMySelf := false
+	isAtMe := false
+	mediaUrl := ""
+	content := msg["Content"].(string)
+	fromUserName := msg["FromUserName"].(string)
 	senderUserInfo := SenderUserInfo{}
+	senderUserId := ""
+	toUserName := msg["ToUserName"].(string)
+	recommendInfo := map[string]interface{}{}
+	locationInfo := LocationInfo{}
+	senderUserName := fromUserName
+
 	var groupUserName string
-	if strings.HasPrefix(fromUserName, "@@") {	// 消息来自于群
+	if strings.HasPrefix(fromUserName, "@@") {
 		groupUserName = fromUserName
-	} else if strings.HasPrefix(toUserName, "@@") { // 消息来自于群
+	} else if strings.HasPrefix(toUserName, "@@") {
 		groupUserName = toUserName
 	}
 
-	isGroupMsg := false // 标识是否是群消息
 	if len(groupUserName) > 0 {
-		isGroupMsg = true
+		isGroupMessage = true
 	}
 
 	msgType := msg["MsgType"].(float64)
 	mid := msg["MsgId"].(string)
 
-	isMediaMsg := false
-	mediaUrl := ""
 	path := ""
 	switch msgType {
 	case 3: {
-		// 图片
+		messageType = ImgMessage
 		path = "webwxgetmsgimg"
 	}
 	case 47: {
-		// pid 图片
 		pid, _ := msg["HasProductId"].(float64)
 		if pid == 0 {
+			messageType = ImgMessage
 			path = "webwxgetmsgimg"
 		}
 	}
 	case 34: {
-		// 语音
+		messageType = VoiceMessage
 		path = "webwxgetvoice"
 	}
 	case 43: {
-		// 视频
+		messageType = VideoMessage
 		path = "webwxgetvideo"
 	}
 	case 37: {
-		// 好友请求
+		messageType = FriendReqMessage
+		recommendInfo, _ = msg["RecommendInfo"].(map[string]interface{})
+	}
+	case 42: {
+		messageType = CardMessage
 	}
 	}
 	if len(path) > 0 {
-		isMediaMsg = true
-		mediaUrl = fmt.Sprintf(`https://wx2.qq.com/%s?msgid=%v&%v`, path, mid, this.skeyKV())
+		mediaUrl = fmt.Sprintf(`https://wx2.qq.com/%s?msgid=%v&%v`, path, mid, weChat.skeyKV())
 	}
 
-	isAtMe := false
-	if isGroupMsg {
+	subMsgType, found := msg["SubMsgType"]
+	if found && 48 == subMsgType.(float64){
+		messageType = LocationMessage
+		locationX, locationY, locationLabel, err := utils.GetLocationInfoFromOriContent(msg["OriContent"].(string))
+		if err == nil {
+			locationInfo.X = locationX
+			locationInfo.Y = locationY
+			locationInfo.Label = locationLabel
+		}
+
+		locationImg,err := utils.GetLocationImgFromContent(content)
+		if err == nil {
+			locationInfo.Img = "https://" + weChat.host + locationImg
+		}
+	}
+
+	if isGroupMessage {
 		atme := "@"
-		if len(this.me.DisplayName) > 0 {
-			atme += this.me.DisplayName
+		if len(weChat.me.DisplayName) > 0 {
+			atme += weChat.me.DisplayName
 		} else {
-			atme += this.me.NickName
+			atme += weChat.me.NickName
 		}
 		isAtMe = strings.Contains(content, atme) // 标识是否是@我
 
@@ -193,13 +375,13 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 		}
 
 		content = infos[1]
-		if isAtMe && infos[0] == this.me.UserName {
+		if isAtMe && infos[0] == weChat.me.UserName {
 			isSendByMySelf = true
 		}
 
-		contact := &Memeber{}
+		contact := &Member{}
 		for {
-			fromGroup, found := this.contacts[fromUserName]
+			fromGroup, found := weChat.contacts[fromUserName]
 			if found {
 				contact, found  = fromGroup.MemberMap[infos[0]] // 根据content中UserName(消息发布人)找到详细数据
 				if found {
@@ -207,12 +389,12 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 				}
 			}
 
-			_,err := this.updateOrAddContact([]string{fromUserName})
+			err := weChat.updateContact([]string{fromUserName})
 			if err != nil {
 				return
 			}
 
-			contact, found = this.contacts[fromUserName].MemberMap[infos[0]]
+			contact, found = weChat.contacts[fromUserName].MemberMap[infos[0]]
 			if !found {
 				return
 			}
@@ -222,94 +404,76 @@ func (this *Wechat) emitNewMessageEvent(msg map[string]interface{}) {
 			return
 		}
 
-		senderUserName = infos[0] // 实际发布人
+		senderUserName = infos[0]
 		senderUserInfo = SenderUserInfo{
 			UserName: infos[0],
 			NickName: contact.NickName,
-			ContactType: GroupMember,
 		}
-
 	} else {
 
-		isSendByMySelf = fromUserName == this.me.UserName
+		isSendByMySelf = fromUserName == weChat.me.UserName
 		if isSendByMySelf {
 			senderUserInfo = SenderUserInfo{
 				UserName: senderUserName,
-				NickName: this.me.NickName,
-				ContactType: 0,
+				NickName: weChat.me.NickName,
 			}
 		} else {
 			senderUserInfo = SenderUserInfo{
 				UserName: senderUserName,
-				NickName: this.contacts[senderUserName].NickName,
-				ContactType: this.contacts[senderUserName].Type,
+				NickName: "",
+			}
+			senderUser, found := weChat.contacts[senderUserName]
+			if found {
+				senderUserInfo.NickName = senderUser.NickName
 			}
 		}
 	}
 
-	fromUserInfo := this.me
+
+	fromUserInfo := weChat.me
 	if !isSendByMySelf {
-		fromUserInfo = *this.contacts[fromUserName]
+		fromUserInfoTemp, found := weChat.contacts[fromUserName]
+		if found {
+			fromUserInfo = *fromUserInfoTemp
+		}
 	}
 
-	toUserInfo := this.me
-	if toUserName != this.me.UserName {
-		toUserInfo = *this.contacts[toUserName]
+	toUserInfo := weChat.me
+	if toUserName != weChat.me.UserName {
+		toUserInfoTemp, found := weChat.contacts[toUserName]
+		if found {
+			toUserInfo = *toUserInfoTemp
+		}
 	}
 
-	senderUserId := this.utils.userName2Id(senderUserName)
-	data := MsgEventData {
-		IsGroupMsg:		isGroupMsg,
-		IsMediaMsg:		isMediaMsg,
-		IsSendByMySelf:	isSendByMySelf,
-		MsgType:		int64(msgType),
-		AtMe:			isAtMe,
-		MediaUrl:		mediaUrl,
-		Content:		content,
-		FromUserName:	fromUserName,
-		FromUserInfo:	fromUserInfo,
-		SenderUserName:	senderUserName,
-		SenderUserInfo:	senderUserInfo,
-		SenderUserId:   senderUserId,
-		ToUserName:		toUserName,
-		ToUserInfo:		toUserInfo,
-		OriginalMsg:	msg,
-		LocationX:		"",
-		LocationY:		"",
-		LocationLabel:  "",
-	}
+	senderUserId = utils.UserName2Id(senderUserName)
 
 	event := Event {
-		Time:	time.Now().Unix(),
-		Data:	data,
+		Time:		time.Now().Unix(),
+		EventType: 	MessageEvent,
+		Data:		MessageEventData {
+			MessageType:		messageType,
+			IsGroupMessage:		isGroupMessage,
+			IsSendByMySelf:		isSendByMySelf,
+			IsAtMe:				isAtMe,
+			MediaUrl:			mediaUrl,
+			Content:			content,
+			FromUserName:		fromUserName,
+			FromUserInfo:		fromUserInfo,
+			SenderUserInfo:		senderUserInfo,
+			SenderUserId:   	senderUserId,
+			ToUserName:			toUserName,
+			ToUserInfo:			toUserInfo,
+			RecommendInfo:		recommendInfo,
+			LocationInfo: 		locationInfo,
+			OriginalMsg:		msg,
+		},
 	}
-	handler, found := this.handlers[MsgEvent]
-	if found {
-		handler(event)
+
+	weChat.logger.Println("[Info] Get Message. SenderNickName=[" + senderUserInfo.NickName + "], Content=[" + content + "]")
+	listener, isReg := weChat.listeners[MessageEvent]
+	if isReg {
+		listener(event)
 	}
 }
 
-func (this *Wechat) emitContactChangeEvent(contactChangeType ContactChangeType, userName string) {
-	data := ContactEventData {
-		ChangeType: contactChangeType,
-		UserName:	userName,
-	}
-
-	handler, found := this.handlers[ContactChangeEvent]
-	if found {
-		handler(Event{
-			Time: time.Now().Unix(),
-			Data: data,
-		})
-	}
-}
-
-func (this *Wechat) LocationMsgEvent() {
-	/*
-	OriContent
-	<?xml version="1.0"?>
-	<msg>
-		<location x="36.095364" y="120.373940" scale="16" label="市北区鞍山路(青岛鞍山路小学南)" maptype="0" poiname="[位置]" />
-	</msg>
-	*/
-}

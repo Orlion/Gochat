@@ -6,18 +6,20 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
+	"gochat/utils"
 )
 
-type ContactType int	// 联系人类型
+// 联系人类型
+type ContactType int
 
 const (
 	_ ContactType = iota
-	Offical				// 公众号
+	Official			// 公众号
 	Friend				// 好友
 	Group				// 群组
-	GroupMember			// 群成员
 )
 
+// 联系人
 type Contact struct {
 	Uin					float64
 	UserName        	string
@@ -25,8 +27,8 @@ type Contact struct {
 	HeadImgUrl      	string
 	ContactFlag     	float64
 	MemberCount			float64
-	MemberList      	[]*Memeber
-	MemberMap			map[string]*Memeber
+	MemberList      	[]*Member
+	MemberMap			map[string]*Member
 	RemarkName			string
 	HideInputBarFlag	float64
 	Sex					float64
@@ -53,7 +55,8 @@ type Contact struct {
 	Type            	ContactType
 }
 
-type Memeber struct {
+// 群组成员
+type Member struct {
 	Uin 			float64
 	UserName		string
 	NickName		string
@@ -80,18 +83,18 @@ type batchGetContactResponse struct {
 	ContactList []Contact
 }
 
-func (this *Wechat) initContact() error {
+// 初始化通讯录
+func (weChat *WeChat) initContact() error {
 	seq := float64(-1)
 
-	// 初始化为空
 	var cts = []Contact{}
-	this.contacts = map[string]*Contact{}
+	weChat.contacts = map[string]*Contact{}
 
 	for seq != 0 {
 		if -1 == seq {
 			seq = 0
 		}
-		contactList, s, err := this.getContacts(seq)
+		contactList, s, err := weChat.getContacts(seq)
 		if err != nil {
 			return err
 		}
@@ -99,7 +102,6 @@ func (this *Wechat) initContact() error {
 		cts = append(cts, contactList...)
 	}
 
-	// 初始化群的成员列表
 	var groupUserNames []string
 
 	for _, v := range cts {
@@ -107,43 +109,40 @@ func (this *Wechat) initContact() error {
 		userName := v.UserName
 
 		if verifyFlag / 8 != 0 {
-			v.Type = Offical
+			v.Type = Official
 		} else if strings.HasPrefix(userName, "@@") {
 			v.Type = Group
 			groupUserNames = append(groupUserNames, userName)
 		} else {
 			v.Type = Friend
 		}
-		this.contacts[userName] = &v
+		weChat.contacts[userName] = &v
 	}
 
-	groups, _ := this.fetchContacts(groupUserNames)
+	groups, _ := weChat.fetchContacts(groupUserNames)
 	for _, group := range groups {
-		group.MemberMap = map[string]*Memeber{}
+		group.MemberMap = map[string]*Member{}
 		for _, contact := range group.MemberList {
 			group.MemberMap[contact.UserName] = contact
 		}
-		this.contacts[group.UserName] = &group
+		weChat.contacts[group.UserName] = &group
 	}
 
 	return nil
 }
 
-func (this *Wechat) getContacts(seq float64) ([]Contact, float64, error) {
+// 获取联系人
+func (weChat *WeChat) getContacts(seq float64) ([]Contact, float64, error) {
 
-	getContactsApiUrl := strings.Replace(Config["getcontact_api"], "{pass_ticket}", this.passTicket, 1)
+	getContactsApiUrl := strings.Replace(weChatApi["getContactApi"], "{pass_ticket}", weChat.passTicket, 1)
 	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{seq}", strconv.FormatInt(int64(seq), 10), 1)
-	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{skey}", this.baseRequest.Skey, 1)
-	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{r}", this.utils.getUnixTime(), 1)
-	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{host}", this.host, 1)
+	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{skey}", weChat.baseRequest.Skey, 1)
+	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{r}", utils.GetUnixTime(), 1)
+	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{host}", weChat.host, 1)
 
-	content, err := this.httpClient.get(getContactsApiUrl, time.Second * 5, &HttpHeader{
-		Accept: 			"application/json, text/plain, */*",
-		AcceptEncoding: 	"gzip, deflate, br",
-		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-		Connection: 		"keep-alive",
-		Host: 				"login.wx2.qq.com",
-		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+	content, err := weChat.httpClient.get(getContactsApiUrl, time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
 	var resp getContactResponse
@@ -155,22 +154,20 @@ func (this *Wechat) getContacts(seq float64) ([]Contact, float64, error) {
 	return resp.MemberList, resp.Seq, nil
 }
 
-/**
- * 根据qunUserName获取MemberList
- */
-func (this *Wechat) fetchContacts(userNames []string) ([]Contact, error) {
+// 获取联系人详情, 群组获取成员
+func (weChat *WeChat) fetchContacts(userNames []string) ([]Contact, error) {
 
 	var list []map[string]string
 
 	for _, u := range userNames {
 		list = append(list, map[string]string{
-			"UserName": u,
-			"ChatRoomId": "",
+			"UserName": 	u,
+			"ChatRoomId": 	"",
 		})
 	}
 
 	data, err := json.Marshal(map[string]interface{}{
-		"BaseRequest": 	this.baseRequest,
+		"BaseRequest": 	weChat.baseRequest,
 		"Count":		len(list),
 		"List":			list,
 	})
@@ -179,11 +176,11 @@ func (this *Wechat) fetchContacts(userNames []string) ([]Contact, error) {
 		return nil, err
 	}
 
-	batchGetcontactApi := strings.Replace(Config["batchgetcontact_api"], "{r}", this.utils.getUnixMsTime(), 1)
-	batchGetcontactApi = strings.Replace(batchGetcontactApi, "{host}", this.host, 1)
-	content, err := this.httpClient.post(batchGetcontactApi, data, time.Second * 5, &HttpHeader{
-		Host: 				this.host,
-		Referer: 			"https://wx2.qq.com/?&lang=zh_CN",
+	batchGetcontactApi := strings.Replace(weChatApi["batchGetContactApi"], "{r}", utils.GetUnixMsTime(), 1)
+	batchGetcontactApi = strings.Replace(batchGetcontactApi, "{host}", weChat.host, 1)
+	content, err := weChat.httpClient.post(batchGetcontactApi, data, time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
 	var resp batchGetContactResponse
@@ -195,54 +192,56 @@ func (this *Wechat) fetchContacts(userNames []string) ([]Contact, error) {
 	return resp.ContactList, nil
 }
 
-/**
- * 根据UserName添加新成员
- */
-func (this *Wechat) updateOrAddContact(userNames []string) (int, error) {
+// 根据UserName更新联系人
+func (weChat *WeChat) updateContact(userNames []string) error {
 
-	addNum := 0
-
-	contacts, err := this.fetchContacts(userNames)
+	contacts, err := weChat.fetchContacts(userNames)
 
 	if err != nil || len(contacts) != 1 {
-		return 0, errors.New("Fetch contacts failed.")
+		return errors.New("Fetch contacts failed.")
 	}
 
 	for _, contact := range contacts {
-		contact.MemberMap = map[string]*Memeber{}
+		contact.MemberMap = map[string]*Member{}
 		for _, member := range contact.MemberList {
 			contact.MemberMap[member.UserName] = member
 		}
 
 		if contact.VerifyFlag / 8 != 0 {
-			contact.Type = Offical
+			contact.Type = Official
 		} else if strings.HasPrefix(contact.UserName, "@@") {
 			contact.Type = Group
 		} else {
 			contact.Type = Friend
 		}
-		// 添加到通讯录
-		this.contacts[contact.UserName] = &contact
-		addNum++
+
+		weChat.contacts[contact.UserName] = &contact
 	}
 
-	return addNum, nil
+	return nil
 }
 
-/**
- *
- */
-func (this *Wechat) contactsModify(cts []map[string]interface{}) (int, error) {
+// 更新联系人
+func (weChat *WeChat) contactsModify(cts []map[string]interface{}) error {
 	userNames := []string{}
+	userNamesStr := ""
 	for _, newContact := range cts {
 		userNames = append(userNames, newContact["UserName"].(string))
+		userNamesStr += newContact["UserName"].(string) + ", "
 	}
 
-	return this.updateOrAddContact(userNames)
+	weChat.logger.Println("[Info] Contacts Modify. UserNames: " + userNamesStr)
+
+	return weChat.updateContact(userNames)
 }
 
-func (this *Wechat) contactsDelete(cts []map[string]interface{}) {
+// 删除联系人
+func (weChat *WeChat) contactsDelete(cts []map[string]interface{}) {
+	userNamesStr := ""
 	for _, contact := range cts {
-		delete(this.contacts, contact["UserName"].(string))
+		delete(weChat.contacts, contact["UserName"].(string))
+		userNamesStr += contact["UserName"].(string) + ", "
 	}
+
+	weChat.logger.Println("[Info] Contacts Delete. UserNames: " + userNamesStr)
 }

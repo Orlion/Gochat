@@ -1,56 +1,58 @@
 package main
 
 import (
+	"gochat"
+	"os"
 	"fmt"
 	"io/ioutil"
+	"encoding/json"
 	"net/http"
-	"net"
-	"time"
 	"errors"
 	"bytes"
-	"encoding/json"
-	"gochat"
+	"net"
+	"time"
 )
-
 func main() {
-	wechat := gochat.NewWechat(gochat.Option{
-		StorageDirPath: "",
-	})
-	wechat.Handle(gochat.MsgEvent, func(event gochat.Event){
-		eventData, ok := event.Data.(gochat.MsgEventData)
+	weChat := gochat.NewWeChat("storage.json", os.Stdout)
+	MessageListener(weChat)
+	err := weChat.Run()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func MessageListener(weChat *gochat.WeChat) {
+	weChat.SetListener(gochat.MessageEvent, func(event gochat.Event){
+		eventData, ok := event.Data.(gochat.MessageEventData)
 		if ok {
-			if eventData.IsGroupMsg {
-				if eventData.AtMe {
+			if eventData.IsGroupMessage {
+				if eventData.IsAtMe {
 					res, err := tuling(eventData.Content, "青岛",eventData.SenderUserId)
 					if err != nil {
-						wechat.SendTextMsg("@"+ eventData.SenderUserInfo.NickName +" "+"短路了...快通知我主人修修我...", eventData.FromUserName)
+						weChat.SendTextMsg("@"+ eventData.SenderUserInfo.NickName +" "+"短路了...快通知我主人修修我...", eventData.FromUserName)
 					} else {
-						wechat.SendTextMsg("@"+ eventData.SenderUserInfo.NickName +" "+res, eventData.FromUserName)
+						weChat.SendTextMsg("@"+ eventData.SenderUserInfo.NickName +" "+res, eventData.FromUserName)
 					}
 				}
 			} else {
-				res, err := tuling(eventData.Content, eventData.FromUserInfo.City, eventData.SenderUserId)
-				fmt.Println(res)
-				if err != nil || res == ""{
-					wechat.SendTextMsg("短路了...快通知我主人修修我...", eventData.SenderUserName)
+
+				if gochat.FriendReqMessage == eventData.MessageType {
+					reqUserName, okU := eventData.RecommendInfo["UserName"].(string)
+					reqTicket, okT := eventData.RecommendInfo["Ticket"].(string)
+					if okU && okT {
+						weChat.VerifyUser(reqUserName, reqTicket, "你好, I am Oosten.")
+					}
 				} else {
-					wechat.SendTextMsg(res, eventData.SenderUserName)
+					res, err := tuling(eventData.Content, eventData.FromUserInfo.City, eventData.SenderUserId)
+					if err != nil || res == ""{
+						weChat.SendTextMsg("短路了...快通知我主人修修我...", eventData.SenderUserInfo.UserName)
+					} else {
+						weChat.SendTextMsg(res, eventData.SenderUserInfo.UserName)
+					}
 				}
 			}
 		}
 	})
-
-	wechat.Handle(gochat.FriendReqEvent, func(event gochat.Event){
-		fmt.Println("frient event")
-		eventData, ok := event.Data.(gochat.FriendReqEventData)
-		if ok {
-			wechat.VerifyUser(eventData.UserName, eventData.Ticket)
-		}
-	})
-	err := wechat.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
 }
 
 func tuling(input string, city string, userId string) (string, error) {
@@ -74,7 +76,7 @@ func tuling(input string, city string, userId string) (string, error) {
 		},
 	}
 
-	data := `{"perception": {"inputText": {"text": "`+ input +`"},"selfInfo": {"location": {"city": "`+ city +`"},}},"userInfo": {"apiKey": "x","userId": `+ userId +`}}`
+	data := `{"perception": {"inputText": {"text": "`+ input +`"},"selfInfo": {"location": {"city": "`+ city +`"},}},"userInfo": {"apiKey": "","userId": `+ userId +`}}`
 	req, err := http.NewRequest("POST", api, bytes.NewReader([]byte(data)))
 	if err != nil {
 		return ``, err
@@ -90,7 +92,6 @@ func tuling(input string, city string, userId string) (string, error) {
 			Values	map[string]string
 		}
 	}
-	fmt.Println(string(body))
 	var tulingResp = new(Resp)
 	err = json.Unmarshal(body, &tulingResp)
 	if err != nil {
