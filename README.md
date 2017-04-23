@@ -19,14 +19,19 @@ import (
 )
 func main() {
 	weChat := gochat.NewWeChat("storage.json", os.Stdout)
-	RegListener(weChat)
-	err := weChat.Run()
+	MessageListener(weChat)
+	err := weChat.Login()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	err = weChat.Run()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
-func RegListener(weChat *gochat.WeChat) {
+func MessageListener(weChat *gochat.WeChat) {
 	weChat.SetListener(gochat.MESSAGE_EVENT, func(event gochat.Event){
 		eventData, ok := event.Data.(gochat.MessageEventData)
 		if ok {
@@ -57,24 +62,6 @@ func RegListener(weChat *gochat.WeChat) {
 				}
 			}
 		}
-	})
-
-	weChat.SetListener(gochat.CONTACTS_INIT_EVENT, func(event gochat.Event){
-		fileInfo, err := os.Stat("example.js")
-		if err != nil {
-			return
-		}
-
-		buf, err := ioutil.ReadFile("example.js")
-		if err != nil {
-			return
-		}
-		mediaId, err := weChat.UploadMedia(buf, gochat.MEDIA_DOC, "application/javascript", fileInfo, "filehelper")
-		if err != nil {
-			return
-		}
-
-		weChat.SendAppMsg("filehelper", mediaId, "example.js", fileInfo.Size(), "js")
 	})
 }
 ```
