@@ -7,11 +7,10 @@ import (
 	"errors"
 	"strings"
 	"gochat/utils"
-	"fmt"
 	"math/rand"
 )
 
-func (weChat *WeChat) login() error {
+func (weChat *WeChat) beginLogin() error {
 
 	var err error
 	weChat.Uuid, weChat.baseRequest, weChat.passTicket, weChat.httpClient.Cookies, weChat.host, err = weChat.storage.getData()
@@ -21,7 +20,7 @@ func (weChat *WeChat) login() error {
 			return err
 		}
 
-		go weChat.triggerGenUuidEvent(weChat.Uuid)
+		weChat.triggerGenUuidEvent(weChat.Uuid)
 		weChat.logger.Println("[Info] Uuid=" + weChat.Uuid)
 
 		tip := 1
@@ -37,14 +36,14 @@ func (weChat *WeChat) login() error {
 			if 200 == status {
 				redirectUrl = result
 				weChat.logger.Println("[Info] Redirect=" + redirectUrl)
-				go weChat.triggerConfirmAuthEvent(redirectUrl)
+				weChat.triggerConfirmAuthEvent(redirectUrl)
 				break
 			}
 
 			if 201 == status {
 				tip = 0
 				weChat.logger.Println("[Info] Scan Code")
-				go weChat.triggerScanCodeEvent(result)
+				weChat.triggerScanCodeEvent(result)
 			}
 		}
 
@@ -57,8 +56,8 @@ func (weChat *WeChat) login() error {
 		weChat.storage.setData(weChat.Uuid, weChat.baseRequest, weChat.passTicket, weChat.httpClient.Cookies, weChat.host)
 	}
 
-	weChat.logger.Println("[Info] Login: " + fmt.Sprintf("Sid=[ %s ], Uin=[ %s ], Skey=[ %s ], PassTicket=[ %s ]", weChat.baseRequest.Sid, weChat.baseRequest.Uin, weChat.baseRequest.Skey, weChat.passTicket,))
-	go weChat.triggerLoginEvent(weChat.baseRequest.DeviceID)
+	weChat.logger.Println("[Info] Login.")
+	weChat.triggerLoginEvent(weChat.baseRequest.DeviceID)
 
 	return nil
 }

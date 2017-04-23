@@ -10,6 +10,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"io"
+	"strings"
 )
 
 type httpClient struct {
@@ -208,4 +209,14 @@ func (httpClient *httpClient) handleHeader(req *http.Request, header *httpHeader
 	}
 
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
+}
+
+func (httpClient *httpClient) getDataTicket() string {
+	for _, v := range httpClient.Cookies {
+		if strings.Contains(v.String(), "webwx_data_ticket") {
+			return strings.Split(v.String(), "=")[1]
+		}
+	}
+
+	return ""
 }

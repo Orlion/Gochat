@@ -15,14 +15,19 @@ import (
 func main() {
 	weChat := gochat.NewWeChat("storage.json", os.Stdout)
 	MessageListener(weChat)
-	err := weChat.Run()
+	err := weChat.Login()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	err = weChat.Run()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
 func MessageListener(weChat *gochat.WeChat) {
-	weChat.SetListener(gochat.MessageEvent, func(event gochat.Event){
+	weChat.SetListener(gochat.MESSAGE_EVENT, func(event gochat.Event){
 		eventData, ok := event.Data.(gochat.MessageEventData)
 		if ok {
 			if eventData.IsGroupMessage {

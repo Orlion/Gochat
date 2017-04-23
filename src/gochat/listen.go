@@ -119,8 +119,8 @@ func (weChat *WeChat) listen() (string, string, error) {
 	syncCheckApi = strings.Replace(syncCheckApi, "{_}", utils.GetUnixTime(), 1)
 
 	for i, host := range hosts {
-		syncCheckApi = strings.Replace(syncCheckApi, "{host}", host, 1)
-		syncCheckResContent, err := weChat.httpClient.get(syncCheckApi, time.Second * 26, &httpHeader{
+		syncCheckApiDo := strings.Replace(syncCheckApi, "{host}", host, 1)
+		syncCheckResContent, err := weChat.httpClient.get(syncCheckApiDo, time.Second * 26, &httpHeader{
 			Accept:				"*/*",
 			AcceptEncoding:		"gzip, deflate, sdch, br",
 			AcceptLanguage:		"zh-CN,zh;q=0.8",

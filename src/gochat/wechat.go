@@ -1,15 +1,10 @@
 package gochat
 
 import (
-	"time"
 	"fmt"
-	"strings"
-	"encoding/json"
 	"io"
 	"log"
 	"os"
-	"gochat/utils"
-	"errors"
 )
 
 type  WeChat struct {
@@ -25,17 +20,6 @@ type  WeChat struct {
 	storage				*storage
 	logger 				*log.Logger
 	listeners			map[EventType]func(Event)
-}
-
-type initRequest struct {
-	BaseRequest baseRequest
-}
-
-type initResp struct {
-	Response
-	User    	Contact
-	Skey    	string
-	SyncKey 	syncKey
 }
 
 // New A WeChat
@@ -57,10 +41,10 @@ func NewWeChat(storageFilePath string, logFile io.Writer) *WeChat {
 	}
 }
 
-// Run
-func (weChat *WeChat) Run() error {
+// Login And Init
+func (weChat *WeChat) Login() error {
 
-	err := weChat.login()
+	err := weChat.beginLogin()
 	if err != nil {
 		return err
 	}
@@ -68,7 +52,7 @@ func (weChat *WeChat) Run() error {
 	err = weChat.init()
 	if err != nil {
 		weChat.storage.delData()
-		err = weChat.login()
+		err = weChat.beginLogin()
 		if err != nil {
 			return err
 		}
@@ -78,7 +62,7 @@ func (weChat *WeChat) Run() error {
 		}
 	}
 
-	go weChat.triggerInitEvent(weChat.me)
+	weChat.triggerInitEvent(weChat.me)
 	weChat.logger.Println("[Info] WeChat Init.")
 
 	err = weChat.initContact()
@@ -86,54 +70,15 @@ func (weChat *WeChat) Run() error {
 		return err
 	}
 
-	go weChat.triggerContactsInitEvent(len(weChat.contacts))
+	weChat.triggerContactsInitEvent(len(weChat.contacts))
 	weChat.logger.Println("[Info] Contacts Init.")
-
-	weChat.beginListen()
 
 	return nil
 }
 
-// init
-func (weChat *WeChat) init() error {
-	wxInitApi := strings.Replace(weChatApi["initApi"], "{r}", utils.GetUnixTime(), 1)
-	wxInitApi = strings.Replace(wxInitApi, "{host}", weChat.host, 1)
-	wxInitApi = strings.Replace(wxInitApi, "{pass_ticket}", weChat.passTicket, 1)
-
-	postData, err := json.Marshal(initRequest{
-		BaseRequest: weChat.baseRequest,
-	})
-	if err != nil {
-		return err
-	}
-
-	content, err := weChat.httpClient.post(wxInitApi, postData, time.Second * 5, &httpHeader{
-		Accept:				"application/json, text/plain, */*",
-		ContentType:		"application/json;charset=UTF-8",
-		Origin:				"https://" + weChat.host,
-		Host: 				weChat.host,
-		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
-	})
-	if err != nil {
-		return err
-	}
-
-	var initRes initResp
-	err = json.Unmarshal([]byte(content), &initRes)
-	if err != nil {
-		return err
-	}
-
-	if initRes.Response.BaseResponse.Ret != 0 {
-		weChat.logger.Println("[Error] Init Failed. Res.Ret=" + string(initRes.Response.BaseResponse.Ret))
-		return errors.New("Init Failed")
-	}
-
-	weChat.me = initRes.User
-	weChat.baseRequest.Skey = initRes.Skey
-	weChat.syncKey = initRes.SyncKey
-
-	return nil
+func (weChat *WeChat) Run() error {
+	err := weChat.beginListen();
+	return err
 }
 
 func (weChat *WeChat) skeyKV() string {

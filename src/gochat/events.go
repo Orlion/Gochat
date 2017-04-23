@@ -12,16 +12,16 @@ type EventType int
 
 const (
 	_ EventType = iota
-	GenUuidEvent		// 生成Uuid
-	ScanCodeEvent		// 已扫码，未确认
-	ConfirmAuthEvent	// 已确认授权登录
-	LoginEvent 			// 已登录
-	InitEvent			// 初始化完成
-	ContactsInitEvent	// 联系人初始化完
-	ListenFailedEvent 	// 同步微信失败,可能为客户端已退出 | 被微信反爬虫
-	ContactChangeEvent	// 联系人改变了
-	ContactDeleteEvent  // 联系人删除事件
-	MessageEvent		// 消息
+	GEN_UUID_EVENT			// 生成Uuid
+	SCAN_CODE_EVENT			// 已扫码，未确认
+	CONFIRM_AUTH_EVENT		// 已确认授权登录
+	LOGIN_EVENT 			// 已登录
+	INIT_EVENT				// 初始化完成
+	CONTACTS_INIT_EVENT		// 联系人初始化完
+	LISTEN_FAILED_EVENT 	// 同步微信失败,可能为客户端已退出 | 被微信反爬虫
+	CONTACT_MODIFY_EVENT	// 联系人改变了
+	CONTACT_DELETE_EVENT  	// 联系人删除事件
+	MESSAGE_EVENT			// 消息
 )
 
 // 事件体
@@ -68,7 +68,7 @@ type ListenFailedEventData struct {
 }
 
 // 联系人修改事件数据
-type ContactChangeEventData struct {
+type ContactModifyEventData struct {
 	UserNames 	[]string
 }
 
@@ -136,7 +136,7 @@ func (weChat *WeChat) handleSyncResponse(resp *syncMessageResponse) {
 		for _, v := range resp.ModContactList {
 			userNames = append(userNames, v["UserName"].(string))
 		}
-		go weChat.triggerContactChangeEvent(userNames)
+		go weChat.triggerContactModifyEvent(userNames)
 	}
 
 	if resp.DelContactCount > 0 {
@@ -156,11 +156,11 @@ func (weChat *WeChat) handleSyncResponse(resp *syncMessageResponse) {
 
 // 触发生成uuid的事件
 func (weChat *WeChat) triggerGenUuidEvent(uuid string) {
-	listener, isReg := weChat.listeners[GenUuidEvent]
+	listener, isReg := weChat.listeners[GEN_UUID_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType:	GenUuidEvent,
+			EventType:	GEN_UUID_EVENT,
 			Data: 		GenUuidEventData {
 				Uuid:	uuid,
 			},
@@ -170,11 +170,11 @@ func (weChat *WeChat) triggerGenUuidEvent(uuid string) {
 
 // 触发扫码事件(未确认)
 func (weChat *WeChat) triggerScanCodeEvent(userAvatar string) {
-	listener, isReg := weChat.listeners[ScanCodeEvent]
+	listener, isReg := weChat.listeners[SCAN_CODE_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ScanCodeEvent,
+			EventType: 	SCAN_CODE_EVENT,
 			Data: 		ScanCodeEventData {
 				UserAvatar:		userAvatar,
 			},
@@ -184,11 +184,11 @@ func (weChat *WeChat) triggerScanCodeEvent(userAvatar string) {
 
 // 触发授权登录事件
 func (weChat *WeChat) triggerConfirmAuthEvent(redirectUrl string) {
-	listener, isReg := weChat.listeners[ConfirmAuthEvent]
+	listener, isReg := weChat.listeners[CONFIRM_AUTH_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ConfirmAuthEvent,
+			EventType: 	CONFIRM_AUTH_EVENT,
 			Data: 		ConfirmAuthEventData {
 				RedirectUrl:		redirectUrl,
 			},
@@ -198,11 +198,11 @@ func (weChat *WeChat) triggerConfirmAuthEvent(redirectUrl string) {
 
 // 触发登录事件
 func (weChat *WeChat) triggerLoginEvent(deviceID string) {
-	listener, isReg := weChat.listeners[LoginEvent]
+	listener, isReg := weChat.listeners[LOGIN_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	LoginEvent,
+			EventType: 	LOGIN_EVENT,
 			Data: 		LoginEventData {
 				DeviceID:		deviceID,
 			},
@@ -212,11 +212,11 @@ func (weChat *WeChat) triggerLoginEvent(deviceID string) {
 
 // 触发初始化事件
 func (weChat *WeChat) triggerInitEvent(me Contact) {
-	listener, isReg := weChat.listeners[InitEvent]
+	listener, isReg := weChat.listeners[INIT_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	InitEvent,
+			EventType: 	INIT_EVENT,
 			Data: 		InitEventData {
 				Me:		me,
 			},
@@ -226,11 +226,11 @@ func (weChat *WeChat) triggerInitEvent(me Contact) {
 
 // 触发通讯录初始化事件
 func (weChat *WeChat) triggerContactsInitEvent(contactsCount int) {
-	listener, isReg := weChat.listeners[ContactsInitEvent]
+	listener, isReg := weChat.listeners[CONTACTS_INIT_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ContactsInitEvent,
+			EventType: 	CONTACTS_INIT_EVENT,
 			Data: 		ContactsInitEventData {
 				ContactsCount:		contactsCount,
 			},
@@ -239,11 +239,11 @@ func (weChat *WeChat) triggerContactsInitEvent(contactsCount int) {
 }
 
 func (weChat *WeChat) triggerListenFailedEvent(listenFailedCount int, host string) {
-	listener, isReg := weChat.listeners[ListenFailedEvent]
+	listener, isReg := weChat.listeners[LISTEN_FAILED_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ListenFailedEvent,
+			EventType: 	LISTEN_FAILED_EVENT,
 			Data: 		ListenFailedEventData {
 				ListenFailedCount:		listenFailedCount,
 				Host:					host,
@@ -253,13 +253,13 @@ func (weChat *WeChat) triggerListenFailedEvent(listenFailedCount int, host strin
 }
 
 // 触发通讯录修改事件
-func (weChat *WeChat) triggerContactChangeEvent(userNames []string) {
-	listener, isReg := weChat.listeners[ContactChangeEvent]
+func (weChat *WeChat) triggerContactModifyEvent(userNames []string) {
+	listener, isReg := weChat.listeners[CONTACT_MODIFY_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ContactChangeEvent,
-			Data: 		ContactChangeEventData {
+			EventType: 	CONTACT_MODIFY_EVENT,
+			Data: 		ContactModifyEventData {
 				UserNames:	userNames,
 			},
 		})
@@ -268,11 +268,11 @@ func (weChat *WeChat) triggerContactChangeEvent(userNames []string) {
 
 // 触发通讯录删除事件
 func (weChat *WeChat) triggerContactDeleteEvent(userNames []string) {
-	listener, isReg := weChat.listeners[ContactDeleteEvent]
+	listener, isReg := weChat.listeners[CONTACT_DELETE_EVENT]
 	if isReg {
 		listener(Event{
 			Time: 		time.Now().Unix(),
-			EventType: 	ContactDeleteEvent,
+			EventType: 	CONTACT_DELETE_EVENT,
 			Data: 		ContactDeleteEventData {
 				UserNames:	userNames,
 			},
@@ -361,13 +361,13 @@ func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
 	}
 
 	if isGroupMessage {
-		atme := "@"
+		atMe := "@"
 		if len(weChat.me.DisplayName) > 0 {
-			atme += weChat.me.DisplayName
+			atMe += weChat.me.DisplayName
 		} else {
-			atme += weChat.me.NickName
+			atMe += weChat.me.NickName
 		}
-		isAtMe = strings.Contains(content, atme) // 标识是否是@我
+		isAtMe = strings.Contains(content, atMe) // 标识是否是@我
 
 		infos := strings.Split(content, ":<br/>")
 		if len(infos) != 2{
@@ -422,6 +422,7 @@ func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
 				UserName: senderUserName,
 				NickName: "",
 			}
+
 			senderUser, found := weChat.contacts[senderUserName]
 			if found {
 				senderUserInfo.NickName = senderUser.NickName
@@ -450,7 +451,7 @@ func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
 
 	event := Event {
 		Time:		time.Now().Unix(),
-		EventType: 	MessageEvent,
+		EventType: 	MESSAGE_EVENT,
 		Data:		MessageEventData {
 			MessageType:		messageType,
 			IsGroupMessage:		isGroupMessage,
@@ -471,7 +472,7 @@ func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
 	}
 
 	weChat.logger.Println("[Info] Get Message. SenderNickName=[" + senderUserInfo.NickName + "], Content=[" + content + "]")
-	listener, isReg := weChat.listeners[MessageEvent]
+	listener, isReg := weChat.listeners[MESSAGE_EVENT]
 	if isReg {
 		listener(event)
 	}

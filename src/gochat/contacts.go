@@ -73,21 +73,21 @@ type Member struct {
 type getContactResponse struct {
 	Response
 	MemberCount int
-	MemberList  []Contact
+	MemberList  []*Contact
 	Seq         float64
 }
 
 type batchGetContactResponse struct {
 	Response
 	Count       int
-	ContactList []Contact
+	ContactList []*Contact
 }
 
 // 初始化通讯录
 func (weChat *WeChat) initContact() error {
 	seq := float64(-1)
 
-	var cts = []Contact{}
+	var cts = []*Contact{}
 	weChat.contacts = map[string]*Contact{}
 
 	for seq != 0 {
@@ -116,7 +116,7 @@ func (weChat *WeChat) initContact() error {
 		} else {
 			v.Type = Friend
 		}
-		weChat.contacts[userName] = &v
+		weChat.contacts[userName] = v
 	}
 
 	groups, _ := weChat.fetchContacts(groupUserNames)
@@ -125,14 +125,14 @@ func (weChat *WeChat) initContact() error {
 		for _, contact := range group.MemberList {
 			group.MemberMap[contact.UserName] = contact
 		}
-		weChat.contacts[group.UserName] = &group
+		weChat.contacts[group.UserName] = group
 	}
 
 	return nil
 }
 
 // 获取联系人
-func (weChat *WeChat) getContacts(seq float64) ([]Contact, float64, error) {
+func (weChat *WeChat) getContacts(seq float64) ([]*Contact, float64, error) {
 
 	getContactsApiUrl := strings.Replace(weChatApi["getContactApi"], "{pass_ticket}", weChat.passTicket, 1)
 	getContactsApiUrl = strings.Replace(getContactsApiUrl, "{seq}", strconv.FormatInt(int64(seq), 10), 1)
@@ -155,7 +155,7 @@ func (weChat *WeChat) getContacts(seq float64) ([]Contact, float64, error) {
 }
 
 // 获取联系人详情, 群组获取成员
-func (weChat *WeChat) fetchContacts(userNames []string) ([]Contact, error) {
+func (weChat *WeChat) fetchContacts(userNames []string) ([]*Contact, error) {
 
 	var list []map[string]string
 
@@ -176,9 +176,9 @@ func (weChat *WeChat) fetchContacts(userNames []string) ([]Contact, error) {
 		return nil, err
 	}
 
-	batchGetcontactApi := strings.Replace(weChatApi["batchGetContactApi"], "{r}", utils.GetUnixMsTime(), 1)
-	batchGetcontactApi = strings.Replace(batchGetcontactApi, "{host}", weChat.host, 1)
-	content, err := weChat.httpClient.post(batchGetcontactApi, data, time.Second * 5, &httpHeader{
+	batchGetContactApi := strings.Replace(weChatApi["batchGetContactApi"], "{r}", utils.GetUnixMsTime(), 1)
+	batchGetContactApi = strings.Replace(batchGetContactApi, "{host}", weChat.host, 1)
+	content, err := weChat.httpClient.post(batchGetContactApi, data, time.Second * 5, &httpHeader{
 		Host: 				weChat.host,
 		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
@@ -215,7 +215,7 @@ func (weChat *WeChat) updateContact(userNames []string) error {
 			contact.Type = Friend
 		}
 
-		weChat.contacts[contact.UserName] = &contact
+		weChat.contacts[contact.UserName] = contact
 	}
 
 	return nil
