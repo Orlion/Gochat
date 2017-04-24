@@ -1,6 +1,4 @@
-<div align=center>
-    ![](http://i4.buimg.com/567571/4452ae08fdc6880b.jpg)
-</div>
+![](http://i4.buimg.com/567571/4452ae08fdc6880b.jpg)
 
 # Gochat
 一个Go微信机器人包
