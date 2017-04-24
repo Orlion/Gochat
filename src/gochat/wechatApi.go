@@ -14,6 +14,5 @@ var weChatApi = map[string]string {
 	"uploadMediaApi": 		"https://{prefix}.{host}/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json",
 	"sendAppMsgApi":		"https://{host}/cgi-bin/mmwebwx-bin/webwxsendappmsg?fun=async&f=json&pass_ticket={pass_ticket}",
 	"sendImgMsgApi":		"https://{host}/cgi-bin/mmwebwx-bin/webwxsendmsgimg?fun=async&f=json&pass_ticket={pass_ticket}",
-	"logoutApi":			"https://{host}/cgi-bin/mmwebwx-bin/webwxlogout?redirect=1&type=1&skey={skey}", /* sid:IF7Nv4Z1ci0uRAgz uin:2926158633 Upgrade-Insecure-Requests:1*/
 	"pushLoginApi":			"https://{host}/cgi-bin/mmwebwx-bin/webwxpushloginurl?uin={uin}",
 }

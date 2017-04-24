@@ -1,15 +1,3 @@
-<div align=center>
-    ![](http://i4.buimg.com/567571/4452ae08fdc6880b.jpg)
-</div>
-# Gochat
-一个Go微信机器人包
-# 特点
-1. **灵活**。在微信从登录到开始同步服务器消息的过程中的各个节点触发事件，从而通过注册时间监听器就可以灵活的实现很多功能。  
-2. **失败重新登录**。可以通过注册同步失败的事件重新调用Login()方法来重新登录，从而达到失败自动重新登录, 也可以调用pushlogin的接口免扫码来登录。
-
-# Demo
-> 有部分伪代码,不能直接运行
-```
 package demo
 
 import (
@@ -128,17 +116,3 @@ func RegListener(weChat *gochat.WeChat) {
 		}
 	})
 }
-```
-
-# Something
-&nbsp;&nbsp;写完之后就没什么兴趣用这个库做东西了，主要是用的openshift太慢,而且微信很不稳定经常变更规则。
-
-&nbsp;&nbsp;不过用微信机器人还是可以做很多有趣的事情的，有不少同学在玩微信机器人。可以用java写个Android的App。
-
-&nbsp;&nbsp;类似项目有:
-* https://github.com/littlecodersh/ItChat
-* https://github.com/youfou/wxpy
-* https://github.com/liuwons/wxBot  
-...  
-..  
-.  

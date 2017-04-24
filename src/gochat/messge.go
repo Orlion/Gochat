@@ -40,14 +40,14 @@ const (
 
 var mediaIndex int64 = 0
 
-func (WeChat *WeChat) SendTextMsg(content string, to string) (bool, error) {
-	sendMsgApi := strings.Replace(weChatApi["sendMsgApi"], "{pass_ticket}", WeChat.passTicket, 1)
-	sendMsgApi = strings.Replace(sendMsgApi, "{host}", WeChat.host, 1)
+func (weChat *WeChat) SendTextMsg(content string, to string) (bool, error) {
+	sendMsgApi := strings.Replace(weChatApi["sendMsgApi"], "{pass_ticket}", weChat.passTicket, 1)
+	sendMsgApi = strings.Replace(sendMsgApi, "{host}", weChat.host, 1)
 	msgId := utils.GetUnixMsTime() + strconv.Itoa(rand.Intn(10000))
 	msg := map[string]interface{} {
 		"Content":		content,
 		"ToUserName":	to,
-		"FromUserName": WeChat.me.UserName,
+		"FromUserName": weChat.me.UserName,
 		"LocalID":		msgId,
 		"ClientMsgId":	msgId,
 		"Type":			"1",
@@ -55,9 +55,9 @@ func (WeChat *WeChat) SendTextMsg(content string, to string) (bool, error) {
 
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
-	enc.SetEscapeHTML(false)
+	// enc.SetEscapeHTML(false)
 	err := enc.Encode(map[string]interface{}{
-		`BaseRequest`: WeChat.baseRequest,
+		`BaseRequest`: weChat.baseRequest,
 		`Msg`:         msg,
 		`Scene`:       0,
 	})
@@ -66,9 +66,9 @@ func (WeChat *WeChat) SendTextMsg(content string, to string) (bool, error) {
 		return false, err
 	}
 
-	respContent, err := WeChat.httpClient.post(sendMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
-		Host: 				WeChat.host,
-		Referer: 			"https://"+ WeChat.host +"/?&lang=zh_CN",
+	respContent, err := weChat.httpClient.post(sendMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
 	var resp sendMsgResponse
@@ -86,14 +86,14 @@ func (WeChat *WeChat) SendTextMsg(content string, to string) (bool, error) {
 
 
 // 发送图片消息
-func (WeChat *WeChat) SendImgMsg(toUserFrom string, mediaId string) error {
-	sendImgMsgApi := strings.Replace(weChatApi["sendImgMsgApi"], "{host}", WeChat.host, 1)
-	sendImgMsgApi = strings.Replace(sendImgMsgApi, "{pass_ticket}", WeChat.passTicket, 1)
+func (weChat *WeChat) SendImgMsg(toUserFrom string, mediaId string) error {
+	sendImgMsgApi := strings.Replace(weChatApi["sendImgMsgApi"], "{host}", weChat.host, 1)
+	sendImgMsgApi = strings.Replace(sendImgMsgApi, "{pass_ticket}", weChat.passTicket, 1)
 	msgId := utils.GetUnixMsTime() + strconv.Itoa(rand.Intn(10000))
 	msg := map[string]interface{} {
 		"Content":		"",
 		"ToUserName":	toUserFrom,
-		"FromUserName": WeChat.me.UserName,
+		"FromUserName": weChat.me.UserName,
 		"LocalID":		msgId,
 		"MediaId":		mediaId,
 		"Type":			"3",
@@ -101,9 +101,9 @@ func (WeChat *WeChat) SendImgMsg(toUserFrom string, mediaId string) error {
 
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
-	enc.SetEscapeHTML(false)
+	// enc.SetEscapeHTML(false)
 	err := enc.Encode(map[string]interface{}{
-		"BaseRequest": WeChat.baseRequest,
+		"BaseRequest": weChat.baseRequest,
 		"Msg":         msg,
 		"Scene":       0,
 	})
@@ -112,12 +112,11 @@ func (WeChat *WeChat) SendImgMsg(toUserFrom string, mediaId string) error {
 		return err
 	}
 
-	respContent, err := WeChat.httpClient.post(sendImgMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
-		Host: 				WeChat.host,
-		Referer: 			"https://"+ WeChat.host +"/?&lang=zh_CN",
+	respContent, err := weChat.httpClient.post(sendImgMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
-	fmt.Println(respContent)
 	var resp sendMsgResponse
 	err = json.Unmarshal([]byte(respContent), &resp)
 	if err != nil {
@@ -132,16 +131,16 @@ func (WeChat *WeChat) SendImgMsg(toUserFrom string, mediaId string) error {
 }
 
 // 发送文件消息
-func (WeChat *WeChat) SendAppMsg(toUserName string, mediaId string, filename string, fileSize int64, ext string) error {
-	sendAppMsgApi := strings.Replace(weChatApi["sendAppMsgApi"], "{host}", WeChat.host, 1)
-	sendAppMsgApi = strings.Replace(sendAppMsgApi, "{pass_ticket}", WeChat.passTicket, 1)
+func (weChat *WeChat) SendAppMsg(toUserName string, mediaId string, filename string, fileSize int64, ext string) error {
+	sendAppMsgApi := strings.Replace(weChatApi["sendAppMsgApi"], "{host}", weChat.host, 1)
+	sendAppMsgApi = strings.Replace(sendAppMsgApi, "{pass_ticket}", weChat.passTicket, 1)
 	msgId := utils.GetUnixMsTime() + strconv.Itoa(rand.Intn(10000))
 	content := fmt.Sprintf("<appmsg appid='wxeb7ec651dd0aefa9' sdkver=''><title>%s</title><des></des><action></action><type>6</type><content></content><url></url><lowurl></lowurl><appattach><totallen>%d</totallen><attachid>%s</attachid><fileext>%s</fileext></appattach><extinfo></extinfo></appmsg>", filename, fileSize, mediaId, ext)
 
 	msg := map[string]interface{} {
 		"ClientMsgId":	msgId,
 		"Content":		content,
-		"FromUserName": WeChat.me.UserName,
+		"FromUserName": weChat.me.UserName,
 		"LocalID":		msgId,
 		"ToUserName":	toUserName,
 		"Type":			"6",
@@ -149,9 +148,9 @@ func (WeChat *WeChat) SendAppMsg(toUserName string, mediaId string, filename str
 
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
-	enc.SetEscapeHTML(false)
+	// enc.SetEscapeHTML(false)
 	err := enc.Encode(map[string]interface{}{
-		`BaseRequest`: WeChat.baseRequest,
+		`BaseRequest`: weChat.baseRequest,
 		`Msg`:         msg,
 		`Scene`:       0,
 	})
@@ -160,17 +159,16 @@ func (WeChat *WeChat) SendAppMsg(toUserName string, mediaId string, filename str
 		return err
 	}
 
-	respContent, err := WeChat.httpClient.post(sendAppMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
+	respContent, err := weChat.httpClient.post(sendAppMsgApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
 		Accept: 			"application/json, text/plain, */*",
 		AcceptEncoding: 	"gzip, deflate, br",
 		AcceptLanguage: 	"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
 		Connection: 		"keep-alive",
 		ContentType:		"application/json;charset=utf-8",
-		Host: 				WeChat.host,
-		Referer: 			"https://"+ WeChat.host +"/?&lang=zh_CN",
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
-	fmt.Println(msg)
 	var resp sendMsgResponse
 	err = json.Unmarshal([]byte(respContent), &resp)
 	if err != nil {
@@ -250,7 +248,6 @@ func (weChat *WeChat) UploadMedia(buf []byte, mediaType MediaType, fileType stri
 			Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 		})
 
-		fmt.Println(respContent)
 		var resp uploadMediaResponse
 		err = json.Unmarshal([]byte(respContent), &resp)
 		if err != nil {
@@ -266,35 +263,34 @@ func (weChat *WeChat) UploadMedia(buf []byte, mediaType MediaType, fileType stri
 }
 
 // 授权好友请求
-func (WeChat *WeChat) VerifyUser(userName string, ticket string, verifyUserContent string) error {
-	verifyUserApi := strings.Replace(weChatApi["verifyUserApi"], "{pass_ticket}", WeChat.passTicket, 1)
-	verifyUserApi = strings.Replace(verifyUserApi, "{host}", WeChat.host, 1)
+func (weChat *WeChat) VerifyUser(userName string, ticket string, verifyUserContent string) error {
+	verifyUserApi := strings.Replace(weChatApi["verifyUserApi"], "{pass_ticket}", weChat.passTicket, 1)
+	verifyUserApi = strings.Replace(verifyUserApi, "{host}", weChat.host, 1)
 	verifyUserApi = strings.Replace(verifyUserApi, "{r}", utils.GetUnixMsTime(), 1)
 
 	buffer := new(bytes.Buffer)
 	enc := json.NewEncoder(buffer)
-	enc.SetEscapeHTML(false)
+	// enc.SetEscapeHTML(false)
 	err := enc.Encode(map[string]interface{}{
-		"BaseRequest": 			WeChat.baseRequest,
+		"BaseRequest": 			weChat.baseRequest,
 		"Opcode":				3,
 		"SceneList":			[]int{33},
 		"SceneListCount":		1,
 		"VerifyContent":		verifyUserContent,
 		"VerifyUserList":		[]map[string]string{{"Value": userName,"VerifyUserTicket": ticket}},
 		"VerifyUserListSize":	1,
-		"skey":       			WeChat.baseRequest.Skey,
+		"skey":       			weChat.baseRequest.Skey,
 	})
 
 	if err != nil {
 		return err
 	}
 
-	respContent, err := WeChat.httpClient.post(verifyUserApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
-		Host: 				WeChat.host,
-		Referer: 			"https://"+ WeChat.host +"/?&lang=zh_CN",
+	respContent, err := weChat.httpClient.post(verifyUserApi, []byte(buffer.String()), time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
 	})
 
-	fmt.Println(respContent)
 	var resp verifyUserResponse
 	err = json.Unmarshal([]byte(respContent), &resp)
 	if err != nil {

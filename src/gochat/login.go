@@ -8,7 +8,14 @@ import (
 	"strings"
 	"gochat/utils"
 	"math/rand"
+	"encoding/json"
 )
+
+type pushLoginResponse struct {
+	Msg 	string
+	Ret 	string
+	Uuid 	string
+}
 
 func (weChat *WeChat) beginLogin() error {
 
@@ -141,4 +148,33 @@ func (weChat *WeChat) doLogin(redirectUrl string) error {
 	weChat.baseRequest.Sid, weChat.baseRequest.Uin, weChat.baseRequest.Skey, weChat.passTicket, err = utils.AnalysisLoginXml(content)
 
 	return err
+}
+
+// 绑定登录
+func (weChat *WeChat) pushLogin() (string, error) {
+	pushLoginApi := strings.Replace(weChatApi["pushLoginApi"], "{uin}", weChat.baseRequest.Uin, 1)
+	content, err := weChat.httpClient.get(pushLoginApi, time.Second * 5, &httpHeader{
+		Host: 				weChat.host,
+		Referer: 			"https://"+ weChat.host +"/?&lang=zh_CN",
+	})
+	if err != nil {
+		return "", err
+	}
+
+	var pushLoginResp pushLoginResponse
+	err = json.Unmarshal([]byte(content), &pushLoginResp)
+	if err != nil {
+		return "", err
+	}
+
+	if pushLoginResp.Ret != "0" || "" == pushLoginResp.Uuid{
+		return "", errors.New("Push Login Failed")
+	}
+
+	return pushLoginResp.Uuid, nil
+}
+
+// 退出
+func (weChat *WeChat) Logout() {
+
 }

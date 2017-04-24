@@ -477,4 +477,3 @@ func (weChat *WeChat) triggerMessageEvent(msg map[string]interface{}) {
 		listener(event)
 	}
 }
-

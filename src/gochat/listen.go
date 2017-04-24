@@ -87,7 +87,8 @@ func (weChat *WeChat) beginListen() error {
 			for continueFlag != 0 {
 				resp, err := weChat.sync()
 				if err != nil {
-					return err
+					weChat.logger.Println("[Error] Sync Failed. Msg:" + err.Error())
+					continue
 				}
 				continueFlag = resp.ContinueFlag
 
@@ -132,7 +133,6 @@ func (weChat *WeChat) listen() (string, string, error) {
 			return "", "0", err
 		}
 
-		fmt.Println(host + " | " + syncCheckResContent)
 		code, selector, err := weChat.analysisSelector(syncCheckResContent)
 		if err != nil {
 			return "", "0", err
